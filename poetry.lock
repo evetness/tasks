@@ -458,6 +458,25 @@ MarkupSafe = ">=2.0"
 i18n = ["Babel (>=2.7)"]
 
 [[package]]
+name = "loguru"
+version = "0.7.0"
+description = "Python logging made (stupidly) simple"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "loguru-0.7.0-py3-none-any.whl", hash = "sha256:b93aa30099fa6860d4727f1b81f8718e965bb96253fa190fab2077aaad6d15d3"},
+    {file = "loguru-0.7.0.tar.gz", hash = "sha256:1612053ced6ae84d7959dd7d5e431a0532642237ec21f7fd83ac73fe539e03e1"},
+]
+
+[package.dependencies]
+colorama = {version = ">=0.3.4", markers = "sys_platform == \"win32\""}
+win32-setctime = {version = ">=1.0.0", markers = "sys_platform == \"win32\""}
+
+[package.extras]
+dev = ["Sphinx (==5.3.0)", "colorama (==0.4.5)", "colorama (==0.4.6)", "freezegun (==1.1.0)", "freezegun (==1.2.2)", "mypy (==v0.910)", "mypy (==v0.971)", "mypy (==v0.990)", "pre-commit (==3.2.1)", "pytest (==6.1.2)", "pytest (==7.2.1)", "pytest-cov (==2.12.1)", "pytest-cov (==4.0.0)", "pytest-mypy-plugins (==1.10.1)", "pytest-mypy-plugins (==1.9.3)", "sphinx-autobuild (==2021.3.14)", "sphinx-rtd-theme (==1.2.0)", "tox (==3.27.1)", "tox (==4.4.6)"]
+
+[[package]]
 name = "mako"
 version = "1.2.4"
 description = "A super-fast templating language that borrows the best ideas from the existing templating languages."
@@ -476,6 +495,28 @@ MarkupSafe = ">=0.9.2"
 babel = ["Babel"]
 lingua = ["lingua"]
 testing = ["pytest"]
+
+[[package]]
+name = "mariadb"
+version = "1.1.7"
+description = "Python MariaDB extension"
+category = "main"
+optional = false
+python-versions = ">=3.8"
+files = [
+    {file = "mariadb-1.1.7-cp310-cp310-win32.whl", hash = "sha256:4cab70488fbe43eb3fca81a43b8f0fc2515a62d1159e20f918197b4496aa77a6"},
+    {file = "mariadb-1.1.7-cp310-cp310-win_amd64.whl", hash = "sha256:9e81117c585bdb7b1221d2938e4d32fb10dec66bb42dc4eb09e0f4a6bc99b2e8"},
+    {file = "mariadb-1.1.7-cp311-cp311-win32.whl", hash = "sha256:860743838a24124612780c7ed30cc9d24d100d8e2ea781195a088d483da56dca"},
+    {file = "mariadb-1.1.7-cp311-cp311-win_amd64.whl", hash = "sha256:3d981a1ace12f10915e9871e091533ff5d491206886988e9ea33e2d82f16eb02"},
+    {file = "mariadb-1.1.7-cp38-cp38-win32.whl", hash = "sha256:8c77208b0f7cc84c5e6bd81c048a071065a49feb9c15757ad7b299d4d194f17d"},
+    {file = "mariadb-1.1.7-cp38-cp38-win_amd64.whl", hash = "sha256:07c421f974dbc67e0f96013ba88083b0d72d43164a46b21118953a8cda800682"},
+    {file = "mariadb-1.1.7-cp39-cp39-win32.whl", hash = "sha256:0814a59058b81f10576553b70c245a801d3ed9bb9f4de026fc8f99ffdafbb950"},
+    {file = "mariadb-1.1.7-cp39-cp39-win_amd64.whl", hash = "sha256:a86f46e8fdbb5a14c231586bf4632ad13a5843b36b6627d7f67936776dd07f74"},
+    {file = "mariadb-1.1.7.tar.gz", hash = "sha256:5116ec913fb344f8379d59145f748aaafcfbbf3ba38cc1b81b77aa65081bf08e"},
+]
+
+[package.dependencies]
+packaging = "*"
 
 [[package]]
 name = "markupsafe"
@@ -952,7 +993,22 @@ MarkupSafe = ">=2.1.1"
 [package.extras]
 watchdog = ["watchdog"]
 
+[[package]]
+name = "win32-setctime"
+version = "1.1.0"
+description = "A small Python utility to set file creation time on Windows"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+files = [
+    {file = "win32_setctime-1.1.0-py3-none-any.whl", hash = "sha256:231db239e959c2fe7eb1d7dc129f11172354f98361c4fa2d6d2d7e278baa8aad"},
+    {file = "win32_setctime-1.1.0.tar.gz", hash = "sha256:15cf5750465118d6929ae4de4eb46e8edae9a5634350c01ba582df868e932cb2"},
+]
+
+[package.extras]
+dev = ["black (>=19.3b0)", "pytest (>=4.6.2)"]
+
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "cd89a5cdb16513629a42d0b139ccfb72cb6709c3a3781e11a761ef55a318b39d"
+content-hash = "a942aa9d35bedf530e7a692a576ccaff29f0dcffd2c38b0c45157a4da1449308"

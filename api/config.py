@@ -1,57 +1,43 @@
 from __future__ import annotations
 
-import datetime
 import os
 
-from pydantic import BaseSettings, validator, Field
-from sqlalchemy.engine import URL
+from pydantic import BaseSettings, RedisDsn, validator, Field
 
 BASE_DIRECTORY = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config(BaseSettings):
+    """
+    For generating a `SECRET_KEY` use the following command:
+        $ python3 -c "import secrets; print(secrets.token_urlsafe(32));"
+    """
     TITLE: str = "Tasks API"
     DESCRIPTION: str = "..."
-    VERSION: str = "0.1.0"
-    DEBUG: bool = Field(default=False)
-    TESTING: bool = Field(default=False)
+    DEBUG: bool = Field(default=False, env='FLASK_DEBUG')
+    TESTING: bool = Field(default=False, env='FLASK_TESTING')
+    DISABLE_AUTH: bool = Field(default=False)
     SECRET_KEY: str
+    LOG_LEVEL: str = Field(default="INFO")
 
-    DATABASE_USER: str
-    DATABASE_PASSWORD: str
-    DATABASE_HOST: str = Field(default="localhost")
-    DATABASE_PORT: int = Field(default=3306)
-    DATABASE_NAME: str = Field(default="hive")
-    ALCHEMICAL_DATABASE_URI: str | URL | None = None
+    ALCHEMICAL_DATABASE_URI: str
 
-    @validator("ALCHEMICAL_DATABASE_URI", pre=True)
-    def assemble_db_connection(cls, value: str | None, values: dict):
-        if values.get("TESTING"):
-            return "sqlite:///:memory:"
-
-        if isinstance(value, str):
-            return value
-
-        return str(URL.create(
-            "mysql+pymysql",
-            username=values.get("DATABASE_USER"),
-            password=values.get("DATABASE_PASSWORD"),
-            host=values.get("DATABASE_HOST"),
-            port=values.get("DATABASE_PORT"),
-            database=values.get("DATABASE_NAME"),
-            query={"charset": "utf8"}
-        ))
-
+    CACHE_DEFAULT_TIMEOUT: int = Field(default=0)
     CACHE_TYPE: str = Field(default="RedisCache")
-    CACHE_REDIS_HOST: str = Field(default="localhost")
-    CACHE_REDIS_PORT: int = Field(default=6379)
-    CACHE_REDIS_PASSWORD: str = Field(default="")
-    CACHE_REDIS_DB: str = Field(default="0")
+    CACHE_REDIS_URL: RedisDsn
 
-    CORS_ALLOW_HEADERS: str = "Content-Type, Authorization"
-    CORS_EXPOSE_HEADERS: str = "Content-Disposition"
+    CORS_ALLOW_HEADERS: str | None
+    CORS_EXPOSE_HEADERS: str | None
+    CORS_ORIGINS: str | None
 
-    FILES_DIRECTORY = os.path.join(BASE_DIRECTORY, "protected")
+    @validator("CORS_ALLOW_HEADERS", "CORS_ORIGINS")
+    def convert_separeted_string_to_list_of_string(cls, value: str | None):
+        if not value:
+            return None
+        return [item.strip() for item in value.split(",")]
+    
+    LOGS_DIRECTORY: str = Field(default=os.path.abspath(os.path.join(os.sep, 'var', 'log')))
 
     class Config:
         case_sensitive = True
+        env_prefix = "FLASK_"

@@ -18,6 +18,8 @@ Flask-Cors = "^3.0.10"
 python-dotenv = "^1.0.0"
 Flask-Caching = "^2.0.2"
 redis = "^4.5.4"
+loguru = "^0.7.0"
+mariadb = "^1.1.7"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.3.1"
