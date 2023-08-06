@@ -34,7 +34,7 @@ body {
     @apply tracking-normal border-none focus:ring-0 !important;
   }
   :focus, :focus-visible, :focus-within {
-    @apply focus:outline-none focus:outline-offset-0 !important;
+    @apply focus:outline-none focus:outline-offset-0 focus:ring-0 focus:ring-offset-0 !important;
   }
   hr {
     @apply h-px w-full border-t-brand/50;

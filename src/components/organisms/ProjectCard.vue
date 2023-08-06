@@ -64,7 +64,7 @@ export default {
         <ProjectForm v-else :id="project.id" :name="project.name" @form:submitted="this.editProject"/>
 
       </template>
-      <ProjectForm v-if="create === true" @form:submitted="this.addProject"/>
+      <ProjectForm v-if="create" @form:submitted="this.addProject"/>
     </div>
   </div>
 </template>
