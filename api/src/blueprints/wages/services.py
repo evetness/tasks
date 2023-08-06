@@ -28,19 +28,19 @@ def read_wages(query: WageQuery) -> Pagination:
 def create_wage(data: WageCreate) -> Wage:
     logger.debug(data)
 
-    statement = select(Wage).where(Wage.date == data.date)
+    statement = select(Wage).where(Wage.date == data.date, Wage.project_id == data.project_id)
     logger.debug(statement)
 
     _wage = db.session.scalar(statement)
     if _wage:
-        logger.warning(f"Wage Already Exists: {_wage.id} - {_wage.date}")
+        logger.warning(f"Wage Already Exists: {_wage.id} - {_wage.date} - {_wage.project_id}")
     
     result = Wage(
         date=data.date,
         amount=data.amount,
         currency=data.currency,
         project_id=data.project_id
-    )
+    ).save()
     logger.debug(result)
 
     return result

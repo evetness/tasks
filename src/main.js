@@ -1,4 +1,5 @@
 import { createApp } from 'vue'
+import { createPinia } from 'pinia'
 import axios from 'axios'
 import VueAxios from 'vue-axios'
 
@@ -12,7 +13,10 @@ import {far} from '@fortawesome/free-regular-svg-icons'
 
 library.add(fas, far)
 
+const pinia = createPinia()
+
 createApp(App)
+    .use(pinia)
     .use(VueAxios, axios)
     .component('font-awesome-icon', FontAwesomeIcon)
     .mount('#app')

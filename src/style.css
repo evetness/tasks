@@ -45,9 +45,6 @@ body {
   .card {
     @apply bg-brand/10 border-y border-brand/50 p-2 md:p-3;
   }
-  .card .header {
-    @apply text-lg font-bold leading-none text-brand/80 md:text-xl;
-  }
   .drop-brand-shadow {
     filter: drop-shadow(0 0 0.5rem rgb(var(--color-brand)));
   }
@@ -55,34 +52,24 @@ body {
     filter: drop-shadow(0 0 1rem rgb(var(--color-brand)));
   }
   .btn {
-      @apply inline-flex items-center gap-1 text-sm px-4 py-2.5 font-semibold;
+      @apply inline-flex items-center gap-1 text-sm px-4 py-2.5 font-medium;
   }
   .btn-brand {
-      @apply text-brand bg-brand/30 hover:bg-brand/50 focus:bg-brand/50 border-y border-brand/70 hover:border-brand/90 focus:border-brand/90;
+      @apply text-brand bg-brand/30 hover:bg-brand/50 focus:bg-brand/50 
+      border-y border-brand/70 hover:border-brand/90 focus:border-brand/90;
   }
   .btn-text {
-      @apply text-stone-600 hover:text-stone-500 hover:bg-stone-200 
-      focus:text-stone-500 focus:bg-stone-200 dark:focus:text-stone-200 dark:focus:bg-stone-500
-      dark:text-stone-300 dark:hover:text-stone-200 dark:hover:bg-stone-500;
-  }
-  .btn-danger {
-      @apply text-rose-800 bg-rose-200 hover:bg-rose-200/75 hover:text-rose-700
-      dark:text-white dark:bg-rose-500 dark:hover:text-rose-100 dark:hover:bg-rose-500/75;
-  }
-  .btn-text-danger {
-      @apply text-rose-800 hover:bg-rose-200/75 hover:text-rose-700
-      dark:text-rose-500 dark:hover:text-rose-500 dark:hover:bg-rose-400/20;
+      @apply hover:bg-brand/20 focus:bg-brand/20;
   }
 
-  .btn-brand[disabled], .btn-text[disabled], .btn-danger[disabled], .btn-text-danger[disabled],
-  .btn-brand[aria-disabled], .btn-text[aria-disabled], .btn-danger[aria-disabled], .btn-text-danger[aria-disabled] {
-      @apply pointer-events-none;
+  .btn-brand[disabled], .btn-text[disabled], .btn-brand[aria-disabled], .btn-text[aria-disabled] {
+      @apply cursor-not-allowed;
   }
-  .btn-brand[disabled], .btn-danger[disabled] {
-      @apply text-stone-400 bg-stone-500;
+  .btn-brand[disabled] {
+      @apply text-brand/40 bg-brand/10 border-brand/20;
   }
-  .btn-text[disabled], .btn-text-danger[disabled] {
-      @apply text-stone-400 dark:text-stone-500;
+  .btn-text[disabled] {
+      @apply text-stone-400;
   }
 
 }

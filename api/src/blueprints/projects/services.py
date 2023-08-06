@@ -1,3 +1,4 @@
+from apiflask import HTTPError
 from loguru import logger
 from sqlmodel import col, select, text
 from src.blueprints.projects.schemas import ProjectQuery, ProjectWrite, Unpaid
@@ -15,6 +16,7 @@ def create_project(data: ProjectWrite) -> Project:
     _project = db.session.scalar(statement)
     if _project:
         logger.warning(f"Project Already Exists: {_project.id} - {_project.name}")
+        raise HTTPError(status_code=409, message="Project Already Exists")
 
     result = Project(name=data.name).save()
     logger.debug(result)
@@ -46,6 +48,7 @@ def read_project(ident: int) -> Project:
     result = db.session.get(Project, ident)
     if not result:
         logger.warning(f"Project Not Exists: {ident}")
+        raise HTTPError(status_code=404, message="Project Not Exists")
     logger.debug(result)
 
     return result
@@ -61,6 +64,7 @@ def update_project(ident: int, data: ProjectWrite) -> Project:
     _project = db.session.scalar(statement)
     if _project:
         logger.warning(f"Project Already Exists: {_project.id} - {_project.name}")
+        raise HTTPError(status_code=409, message="Project Already Exists")
     
     result = read_project(ident)
     result.update(name=data.name).save()
@@ -87,6 +91,9 @@ def project_current_salary(ident: int) -> Wage | None:
     logger.debug(statement)
 
     result = db.session.scalar(statement)
+    if not result:
+        logger.warning(f"Project Wage Not Exists: {ident}")
+        return None
     logger.debug(result)
 
     return result
@@ -105,6 +112,7 @@ def calculate_unpaid_wage(ident: int) -> Unpaid | None:
     logger.debug(result)
 
     if not result:
+        logger.warning(f"Project Tasks Not Exists: {ident}")
         return None
     
     current_salary = project_current_salary(project.id)
