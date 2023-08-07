@@ -31,14 +31,20 @@ export default {
       const data = await response.data;
       this.tasks = data.items;
     },
-    addTask(task) {
+    formCreateSubmitted(task) {
       this.create = false
       this.tasks.unshift(task)
     },
-    editTask(task) {
+    formEditSubmitted(task) {
       const index = this.tasks.findIndex((obj => obj.id === task.id))
       this.tasks[index] = task
       this.edit = 0
+    },
+    async removeTask(id) {
+      const response = await axios.delete(`/api/tasks/${id}`)
+      if (response.status !== 204) return;
+
+      this.tasks = this.tasks.filter((obj => obj.id !== id));
     },
     formatCurrency,
   },
@@ -70,13 +76,23 @@ export default {
         </tr>
       </thead>
       <tbody class="text-brand/80">
-        <TaskForm v-if="this.create" @form:submitted="this.addTask"/>
-        <TaskItem v-for="task in tasks" :key="task.id" :task="task"/>
+        <template v-for="task in tasks" :key="task.id">
+          <TaskItem v-if="edit !== task.id" :task="task"
+                    @task:edit="edit = task.id"
+                    @task:remove="removeTask"/>
+          <TaskForm v-else :id="task.id" :name="task.name" :start="task.start" :end="task.end" :completed="task.completed"
+                    @form:submitted="formCreateSubmitted" @form:cancel="edit = 0"/>
+        </template>
+        <TaskForm v-if="create" @form:submitted="formEditSubmitted" @form:cancel="create = false"/>
+        <tr v-if="!create && !edit">
+          <td colspan="6">
+            <button type="button" class="btn btn-text text-sm uppercase w-full justify-center"
+                    :disabled="edit || !project" @click="create = !create">
+              <font-awesome-icon icon="fa-solid fa-plus" />
+            </button>
+          </td>
+        </tr>
       </tbody>
     </table>
-    <button type="button" class="btn btn-brand text-xs uppercase w-full justify-center mt-auto" :disabled="this.edit || !this.project"
-            @click="this.create = !this.create">
-      {{ create ? 'Cancel' : 'New' }}
-    </button>
   </div>
 </template>

@@ -11,16 +11,17 @@ import Checkbox from '@/components/molecules/Checkbox.vue';
 export default {
   name: "TaskForm",
   components: { Input, Checkbox },
-  props: ["id", "name", "start", "end"],
+  props: ["id", "name", "start", "end", "completed"],
   setup() {
     return { v$: useVuelidate() }
   },
   data() {
     return {
       form: {
-        name: this.date || "",
+        name: this.name || "",
         start: this.start || null,
         end: this.end || null,
+        completed: this.completed || false,
         project_id: this.project
       }
     }
@@ -75,7 +76,7 @@ export default {
 </script>
 
 <template>
-  <tr>
+  <tr class="hover:bg-brand/10">
     <td>
       <div class="flex item-center">
         <div class="flex shrink">
@@ -94,13 +95,13 @@ export default {
     </td>
     <td></td>
     <td></td>
-    <td class="text-right">
-      <form id="task-form" @submit.prevent="submitForm" class="flex items-center text-brand/80 text-sm hover:bg-brand/20 focus:bg-brand/20 border-x border-transparent">
-        <button type="submit" class="btn hover:bg-brand/30">
-          <font-awesome-icon icon="fa-regular fa-floppy-disk" />
+    <td>
+      <form id="task-form" @submit.prevent="submitForm" class="flex items-center justify-end">
+        <button type="submit" class="btn btn-text">
+          <font-awesome-icon icon="fa-regular fa-floppy-disk" fixedWidth />
         </button>
-        <button type="button" class="btn hover:bg-brand/30" @click="$emit('form:cancel')">
-          <font-awesome-icon icon="fa-solid fa-xmark" />
+        <button type="button" class="btn btn-text" @click="$emit('form:cancel')">
+          <font-awesome-icon icon="fa-solid fa-xmark" fixedWidth />
         </button>
       </form>
     </td>

@@ -55,10 +55,10 @@ export default {
   <form @submit.prevent="submitForm" class="flex items-center text-brand/80 text-sm hover:bg-brand/20 focus:bg-brand/20 border-x border-transparent">
     <Input label="Name" name="name" type="text" v-model="form.name" :autofocus="true"/>
     <button type="submit" class="btn hover:bg-brand/30">
-      <font-awesome-icon icon="fa-regular fa-floppy-disk" />
+      <font-awesome-icon icon="fa-regular fa-floppy-disk" fixedWidth />
     </button>
     <button type="button" class="btn hover:bg-brand/30" @click="$emit('form:cancel')">
-      <font-awesome-icon icon="fa-solid fa-xmark" />
+      <font-awesome-icon icon="fa-solid fa-xmark" fixedWidth />
     </button>
   </form>
 </template>

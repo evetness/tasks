@@ -1,20 +1,21 @@
 <script>
-import {formatCurrency} from "@/utils.js";
+import { mapState, mapActions } from "pinia";
+import {useProjectStore} from '@/stores/project'
 import moment from "moment/min/moment-with-locales";
 
 export default {
   name: "ProjectWage",
-  props: ["wage", "salary"],
+  props: [],
   methods: {
-    moment
+    moment,
+    ...mapActions(useProjectStore, ["getCurrentWage", "getUnpaidSalary"])
   },
   computed: {
-    amount() {
-      return this.wage ? formatCurrency(this.wage.amount, this.wage.currency) : "-"
-    },
-    unpaid() {
-      return this.salary ? formatCurrency(this.salary.amount, this.salary.currency) : "-"
-    }
+    ...mapState(useProjectStore, ["wage", "amount", "unpaid"])
+  },
+  async mounted() {
+    await this.getCurrentWage()
+    await this.getUnpaidSalary()
   }
 }
 </script>

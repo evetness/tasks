@@ -85,12 +85,12 @@ export default {
       </div>
     </td>
     <td>
-      <form id="wage-form" @submit.prevent="submitForm" class="flex items-center text-brand/80 text-sm justify-end">
-        <button type="submit" class="btn hover:bg-brand/30">
-          <font-awesome-icon icon="fa-regular fa-floppy-disk" />
+      <form id="wage-form" @submit.prevent="submitForm" class="flex items-center justify-end">
+        <button type="submit" class="btn btn-text">
+          <font-awesome-icon icon="fa-regular fa-floppy-disk" fixedWidth />
         </button>
-        <button type="button" class="btn hover:bg-brand/30" @click="$emit('form:cancel')">
-          <font-awesome-icon icon="fa-solid fa-xmark" />
+        <button type="button" class="btn btn-text" @click="$emit('form:cancel')">
+          <font-awesome-icon icon="fa-solid fa-xmark" fixedWidth />
         </button>
       </form>
     </td>

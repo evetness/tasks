@@ -1,42 +1,11 @@
 <script>
-import axios from "axios";
 import ProjectWage from "@/components/molecules/project/ProjectWage.vue";
 
 export default {
   name: "ProjectItem",
   components: {ProjectWage},
   props: ["project", "selected", "canEdit", "canRemove"],
-  emits: ["project:select", "project:canEdit", "project:edit", "project:canRemove", "project:remove"],
-  data() {
-    return {
-      wage: null,
-      salary: null,
-    }
-  },
-  methods: {
-    async getCurrentWage() {
-      const response = await axios.get(`/api/projects/${this.project.id}/current-salary`);
-      const data = await response.data;
-      if (Object.keys(data).length === 0) {
-        this.wage = null;
-      } else {
-        this.wage = data;
-      }
-    },
-    async getUnpaidAmount() {
-      const response = await axios.get(`/api/projects/${this.project.id}/unpaid-tasks`);
-      const data = await response.data;
-      if (Object.keys(data).length === 0) {
-        this.salary = null;
-      } else {
-        this.salary = data;
-      }
-    },
-  },
-  async mounted() {
-    await this.getCurrentWage();
-    await this.getUnpaidAmount();
-  }
+  emits: ["project:select", "project:canEdit", "project:edit", "project:canRemove", "project:remove"]
 }
 </script>
 
@@ -55,16 +24,16 @@ export default {
 
       <button type="button" class="btn btn-text" :disabled="!canEdit"
               @click="$emit('project:edit', project.id)">
-        <font-awesome-icon icon="fa-regular fa-pen-to-square" />
+        <font-awesome-icon icon="fa-regular fa-pen-to-square" fixedWidth />
       </button>
 
       <button type="button" class="btn btn-text" :disabled="!canRemove"
               @click="$emit('project:remove', project.id)">
-        <font-awesome-icon icon="fa-regular fa-trash-can" />
+        <font-awesome-icon icon="fa-regular fa-trash-can" fixedWidth />
       </button>
     </div>
     <div v-if="selected" class="px-3 pt-2 pb-2 text-brand/60 border-x border-brand/60">
-      <ProjectWage :wage="wage" :salary="salary" />
+      <ProjectWage />
     </div>
   </div>
 </template>

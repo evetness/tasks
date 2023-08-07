@@ -1,5 +1,5 @@
 <script>
-import {mapState, mapActions} from 'pinia'
+import {mapState, mapActions, mapWritableState} from 'pinia'
 import {useProjectStore} from '@/stores/project'
 
 import axios from "axios";
@@ -99,16 +99,11 @@ export default {
         <ProjectForm v-else :id="project.id" :name="project.name"
                      @form:submitted="formEditSubmitted" @form:cancel="formEditCancelled"/>
       </template>
-
-    </div>
-
-    <div class="mt-auto">
-      <button v-if="!create" type="button" class="btn btn-brand text-xs uppercase w-full justify-center"
-              @click="create = !create" :disabled="edit">
-        {{ create ? 'Cancel' : 'New' }}
-      </button>
-
       <ProjectForm v-if="create" @form:submitted="formCreateSubmitted" @form:cancel="this.create = false"/>
+      <button v-if="!create" type="button" class="btn btn-text text-sm uppercase w-full justify-center"
+              @click="create = !create" :disabled="edit">
+        <font-awesome-icon icon="fa-solid fa-plus" />
+      </button>
     </div>
   </div>
 </template>

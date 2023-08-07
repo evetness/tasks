@@ -32,17 +32,19 @@ export default {
     <td class="text-xs text-right">{{ this.moment(task.start).format("lll") }}</td>
     <td class="text-xs text-right">{{ this.moment(task.end).format("lll") }}</td>
     <td class="text-xs text-right text-brand">{{ elapsed }}</td>
-    <td class="text-xs text-right text-brand tracking-thighter font-extrabold group-hover:text-sm pr-1">
+    <td class="text-xs text-right text-brand tracking-thighter font-extrabold group-hover:text-sm pr-1 transition-all">
       {{ formatCurrency(task.amount, task.currency) }}
     </td>
-    <td class="text-right">
-      <button type="button" class="btn btn-text" @click="$emit('task:edit', this.task.id)">
-        <font-awesome-icon icon="fa-regular fa-pen-to-square" />
-      </button>
-
-      <button type="button" class="btn btn-text" @click="$emit('task:remove', this.task.id)">
-        <font-awesome-icon icon="fa-regular fa-trash-can" />
-      </button>
+    <td>
+      <div class="flex items-center justify-end">
+        <button type="button" class="btn btn-text" @click="$emit('task:edit', this.task.id)">
+          <font-awesome-icon icon="fa-regular fa-pen-to-square" fixedWidth />
+        </button>
+  
+        <button type="button" class="btn btn-text" @click="$emit('task:remove', this.task.id)">
+          <font-awesome-icon icon="fa-regular fa-trash-can" fixedWidth />
+        </button>
+      </div>
     </td>
   </tr>
 </template>

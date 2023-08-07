@@ -23,14 +23,16 @@ export default {
   <tr class="group hover:bg-brand/20">
     <td class="text-xs text-left pl-2">{{ this.moment(wage.date).format("LL") }}</td>
     <td class="text-xs text-right">{{ this.formatCurrency(wage.amount, wage.currency) }}</td>
-    <td class="text-right">
-      <button type="button" class="btn btn-text" @click="$emit('wage:edit', wage.id)">
-        <font-awesome-icon icon="fa-regular fa-pen-to-square"/>
-      </button>
-
-      <button type="button" class="btn btn-text" @click="$emit('wage:remove', wage.id)">
-        <font-awesome-icon icon="fa-regular fa-trash-can"/>
-      </button>
+    <td>
+      <div class="flex items-center justify-end">
+        <button type="button" class="btn btn-text" @click="$emit('wage:edit', wage.id)">
+          <font-awesome-icon icon="fa-regular fa-pen-to-square" fixedWidth />
+        </button>
+  
+        <button type="button" class="btn btn-text" @click="$emit('wage:remove', wage.id)">
+          <font-awesome-icon icon="fa-regular fa-trash-can" fixedWidth />
+        </button>
+      </div>
     </td>
   </tr>
 </template>

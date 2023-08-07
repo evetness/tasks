@@ -1,5 +1,5 @@
 <script>
-import { mapState } from 'pinia'
+import { mapState, mapActions } from 'pinia'
 import { useProjectStore } from '@/stores/project'
 import axios from "axios";
 
@@ -19,6 +19,10 @@ export default {
     ...mapState(useProjectStore, { project: "id" })
   },
   methods: {
+    async reload() {
+      await this.getCurrentWage()
+      await this.getUnpaidSalary()
+    },
     sortByDate(a, b) {
       let da = new Date(a.date), db = new Date(b.date);
       return db - da;
@@ -31,20 +35,28 @@ export default {
       const data = await response.data;
       this.wages = data.items
     },
-    formCreateSubmitted(wage) {
+    async formCreateSubmitted(wage) {
       this.create = false
       this.wages.push(wage)
       this.wages.sort(this.sortByDate)
+      await this.reload()
     },
-    formEditSubmitted(wage) {
+    async formEditSubmitted(wage) {
+      const index = this.wages.findIndex((obj => obj.id === wage.id))
+      this.wages[index] = wage
+      this.wages.sort(this.sortByDate)
       this.edit = 0
+      await this.reload()
+
     },
     async removeWage(id) {
       const response = await axios.delete(`/api/wages/${id}`)
       if (response.status !== 204) return;
 
       this.wages = this.wages.filter((obj => obj.id !== id));
+      await this.reload()
     },
+    ...mapActions(useProjectStore, ["getCurrentWage", "getUnpaidSalary"])
   },
   mounted() {
     this.loadWages()
@@ -54,7 +66,7 @@ export default {
       this.loadWages()
     }
   },
-  components: {WageItem, WageForm }
+  components: { WageItem, WageForm }
 }
 </script>
 
@@ -74,20 +86,18 @@ export default {
                     @wage:edit="edit = wage.id"
                     @wage:remove="removeWage"/>
           <WageForm v-else :id="wage.id" :date="wage.date" :amount="wage.amount" :currency="wage.currency"
-                    @form:submitted="formEditSubmitted" @form:cancel="this.edit = 0"/>
+                    @form:submitted="formEditSubmitted" @form:cancel="edit = 0"/>
         </template>
-        <WageForm v-if="create" @form:submitted="formCreateSubmitted" @form:cancel="this.create = false"/>
-        <tr>
+        <WageForm v-if="create" @form:submitted="formCreateSubmitted" @form:cancel="create = false"/>
+        <tr v-if="!create && !edit">
           <td colspan="3">
-            <button v-if="!create && !edit" type="button" class="btn btn-text text-sm uppercase w-full justify-center"
-                    :disabled="this.edit || !this.project" @click="this.create = !this.create">
+            <button type="button" class="btn btn-text text-sm uppercase w-full justify-center"
+                    :disabled="edit || !project" @click="create = !create">
               <font-awesome-icon icon="fa-solid fa-plus" />
             </button>
           </td>
         </tr>
       </tbody>
     </table>
-    <div class="mt-auto">
-    </div>
   </div>
 </template>
