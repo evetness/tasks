@@ -2,7 +2,7 @@ import datetime
 from typing import List, Optional
 from loguru import logger
 
-from sqlmodel import Field, Relationship, select
+from sqlmodel import Field, Relationship, select, col
 from src.constants import HOUR
 from src.extensions import db, cache
 from src.extensions.alchemical.models import Base
@@ -20,8 +20,14 @@ class Wage(Base, table=True):
 class Project(Base, table=True):
     name: str = Field(max_length=255)
 
-    wages: List["Wage"] = Relationship(back_populates="project")
-    tasks: List["Task"] = Relationship(back_populates="project")
+    wages: List["Wage"] = Relationship(
+        back_populates="project",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
+    tasks: List["Task"] = Relationship(
+        back_populates="project",
+        sa_relationship_kwargs={"cascade": "all, delete-orphan"}
+    )
 
 
 class Task(Base, table=True):
@@ -66,7 +72,7 @@ class Task(Base, table=True):
             .where(
                 Wage.date <= self.start.date(), 
                 Wage.project_id == self.project_id) \
-            .order_by(Wage.date.desc())
+            .order_by(col(Wage.date).desc())
         logger.debug(statement)
 
         result = db.session.scalar(statement)

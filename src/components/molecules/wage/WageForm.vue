@@ -20,8 +20,7 @@ export default {
       form: {
         date: this.date || null,
         amount: this.amount || 0,
-        currency: this.currency || "",
-        project_id: this.project
+        currency: this.currency || ""
       }
     }
   },
@@ -75,18 +74,25 @@ export default {
 </script>
 
 <template>
-  <form @submit.prevent="submitForm" 
-    class="space-y-1 text-brand/80 text-sm">
-
-    <Input label="Start" name="date" type="date" v-model="form.date"/>  
-    <Input label="Wage" name="amount" type="number" v-model="form.amount" min="0"/>
-    <Input label="Currency" name="currency" type="text" v-model="form.currency" maxlength="3"/>
-  
-    <button type="submit" class="btn hover:bg-brand/30">
-      <font-awesome-icon icon="fa-regular fa-floppy-disk" />
-    </button>
-    <button type="button" class="btn hover:bg-brand/30" @click="$emit('form:cancel')">
-      <font-awesome-icon icon="fa-solid fa-xmark" />
-    </button>
-  </form>
+  <tr>
+    <td>
+      <Input label="Since" name="date" type="date" v-model="form.date" :autofocus="true" form="wage-form"/>
+    </td>
+    <td>
+      <div class="flex">
+        <Input label="Amount" name="amount" type="number" v-model="form.amount" min="0" class="text-right" form="wage-form"/>
+        <Input label="Currency" name="currency" type="text" v-model="form.currency" maxlength="3" form="wage-form"/>
+      </div>
+    </td>
+    <td>
+      <form id="wage-form" @submit.prevent="submitForm" class="flex items-center text-brand/80 text-sm justify-end">
+        <button type="submit" class="btn hover:bg-brand/30">
+          <font-awesome-icon icon="fa-regular fa-floppy-disk" />
+        </button>
+        <button type="button" class="btn hover:bg-brand/30" @click="$emit('form:cancel')">
+          <font-awesome-icon icon="fa-solid fa-xmark" />
+        </button>
+      </form>
+    </td>
+  </tr>
 </template>

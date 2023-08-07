@@ -23,6 +23,8 @@ export default {
   },
   methods: {
     async loadTasks() {
+      if (!this.project) return;
+
       const response = await axios.get('/api/tasks', {
         params: { project_id: this.project, order_by: 'start', order: 'desc' }
       });
@@ -31,7 +33,7 @@ export default {
     },
     addTask(task) {
       this.create = false
-      this.tasks.push(task)
+      this.tasks.unshift(task)
     },
     editTask(task) {
       const index = this.tasks.findIndex((obj => obj.id === task.id))
@@ -40,8 +42,13 @@ export default {
     },
     formatCurrency,
   },
+  mounted() {
+    this.loadTasks();
+  },
   watch: {
     project() {
+      this.create = false;
+      this.edit = 0;
       this.loadTasks();
     }
   },
@@ -50,22 +57,11 @@ export default {
 </script>
 
 <template>
-  <div class="h-full card">
-    <div class="flex items-center justify-between mb-3">
-      <h1 class="font-medium text-lg md:text-xl leading-none text-brand/80 uppercase">
-        Tasks
-      </h1>
-
-      <button :disabled="this.edit || !this.project" type="button" class="btn btn-brand text-xs uppercase"
-        @click="this.create = !this.create">
-        {{ create ? 'Cancel' : 'New' }}
-      </button>
-    </div>
-
+  <div class="flex flex-col h-full">
     <table class="w-full text-sm">
       <thead class="text-brand/70">
         <tr>
-          <th class="w-[40%] text-left">Description</th>
+          <th class="w-[40%] text-left">Status / Description</th>
           <th class="w-[13%] text-right">Start</th>
           <th class="w-[13%] text-right">End</th>
           <th class="w-[12%] text-right">Elapsed</th>
@@ -74,9 +70,13 @@ export default {
         </tr>
       </thead>
       <tbody class="text-brand/80">
-        <TaskItem v-for="task in tasks" :key="task.id" :task="task"/>
         <TaskForm v-if="this.create" @form:submitted="this.addTask"/>
+        <TaskItem v-for="task in tasks" :key="task.id" :task="task"/>
       </tbody>
     </table>
+    <button type="button" class="btn btn-brand text-xs uppercase w-full justify-center mt-auto" :disabled="this.edit || !this.project"
+            @click="this.create = !this.create">
+      {{ create ? 'Cancel' : 'New' }}
+    </button>
   </div>
 </template>

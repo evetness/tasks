@@ -3,119 +3,91 @@ import { mapState } from 'pinia'
 import { useProjectStore } from '@/stores/project'
 import axios from "axios";
 
-import { formatCurrency } from '@/utils';
 import WageForm from '@/components/molecules/wage/WageForm.vue';
+import WageItem from "@/components/molecules/wage/WageItem.vue";
 
 export default {
   name: "WageCard",
   data() {
     return {
-      wage: null,
-      amount: "-",
-      unpaid: "-",
-      edit: false,
+      wages: [],
+      edit: 0,
       create: false
     };
   },
   computed: {
-    ...mapState(useProjectStore, {
-      project: "id"
-    })
+    ...mapState(useProjectStore, { project: "id" })
   },
   methods: {
-    loadAmounts() {
-      this.loadProjectWage(this.project);
-      this.loadProjectUnpaidTasksAmount(this.project);
+    sortByDate(a, b) {
+      let da = new Date(a.date), db = new Date(b.date);
+      return db - da;
     },
-    async loadProjectWage(project_id) {
-      const response = await axios.get(`/api/projects/${project_id}/current-salary`);
+    async loadWages() {
+      if (!this.project) return;
+      const response = await axios.get(`/api/wages`, {
+        params: {order: "DESC", order_by: "date", project_id: this.project}
+      });
       const data = await response.data;
-      if (Object.keys(data).length === 0) {
-        this.wage = null;
-        this.amount = "-";
-      }
-      else {
-        this.wage = data;
-        this.amount = formatCurrency(data.amount, data.currency);
-      }
+      this.wages = data.items
     },
-    async loadProjectUnpaidTasksAmount(project_id) {
-      const response = await axios.get(`/api/projects/${project_id}/unpaid-tasks`);
-      const data = await response.data;
-      if (Object.keys(data).length === 0) {
-        this.unpaid = "-";
-      }
-      else {
-        this.unpaid = formatCurrency(data.amount, data.currency);
-      }
-    },
-    addWage() {
+    formCreateSubmitted(wage) {
       this.create = false
-      this.loadAmounts()
+      this.wages.push(wage)
+      this.wages.sort(this.sortByDate)
     },
-    editWage() {
-      this.loadAmounts()
+    formEditSubmitted(wage) {
       this.edit = 0
     },
-    async removeWage() {
-      const response = await axios.delete(`/api/wages/${this.wage.id}`)
-      this.loadAmounts()
+    async removeWage(id) {
+      const response = await axios.delete(`/api/wages/${id}`)
+      if (response.status !== 204) return;
+
+      this.wages = this.wages.filter((obj => obj.id !== id));
     },
   },
   mounted() {
-    this.loadAmounts()
+    this.loadWages()
   },
   watch: {
     project() {
-      this.loadAmounts()
+      this.loadWages()
     }
   },
-  components: { WageForm }
+  components: {WageItem, WageForm }
 }
 </script>
 
 <template>
-  <div class="h-full card flex flex-col">
-    <div class="flex items-center justify-between mb-3">
-      <h1 class="font-medium text-lg md:text-xl leading-none text-brand/80 uppercase">
-        Wage
-      </h1>
-
-      <button :disabled="this.edit" type="button" class="btn btn-brand text-xs uppercase" @click="this.create = !this.create">
-        {{ create ? 'Cancel' : 'New' }}
-      </button>
+  <div class="flex flex-col h-full">
+    <table class="w-full text-sm">
+      <thead class="text-brand/70">
+        <tr>
+          <th class="w-[40%] text-left">Since</th>
+          <th class="w-[30%] text-right">Amount</th>
+          <th class="w-[20%] text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="text-brand/80">
+        <template v-for="wage in wages" :key="wage.id">
+          <WageItem v-if="edit !== wage.id" :wage="wage"
+                    @wage:edit="edit = wage.id"
+                    @wage:remove="removeWage"/>
+          <WageForm v-else :id="wage.id" :date="wage.date" :amount="wage.amount" :currency="wage.currency"
+                    @form:submitted="formEditSubmitted" @form:cancel="this.edit = 0"/>
+        </template>
+        <WageForm v-if="create" @form:submitted="formCreateSubmitted" @form:cancel="this.create = false"/>
+        <tr>
+          <td colspan="3">
+            <button v-if="!create && !edit" type="button" class="btn btn-text text-sm uppercase w-full justify-center"
+                    :disabled="this.edit || !this.project" @click="this.create = !this.create">
+              <font-awesome-icon icon="fa-solid fa-plus" />
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="mt-auto">
     </div>
-
-    <WageForm v-if="create" @form:submitted="addWage" @form:cancel="this.create = false"/>
-    <WageForm v-if="edit" :id="wage.id" :date="wage.date" :amount="wage.amount" :currency="wage.currency" 
-      @form:submitted="editWage" @form:cancel="this.edit = false"/>
-
-    <div class="leading-none" v-if="!create && !edit">
-      <div class="text-sm text-brand/90 mb-1">Current Wage</div>
-      <div class="flex item-center justify-between">
-
-        <div>
-          <div class="text-brand/80 font-medium">{{ amount }}</div>
-          <div v-if="this.wage" class="text-brand/80 text-xs">{{ this.wage.date }}</div>
-        </div>
-
-        <div v-if="this.wage" class="text-brand/80">
-          <button type="button" class="btn btn-text" @click="this.edit = this.wage?.id">
-            <font-awesome-icon icon="fa-regular fa-pen-to-square" />
-          </button>
-          
-          <button type="button" class="btn btn-text" @click="removeWage">
-            <font-awesome-icon icon="fa-regular fa-trash-can" />
-          </button>
-        </div>
-
-      </div>
-    </div>
-
-    <div class="mt-auto" v-if="!create && !edit">
-      <div class="text-sm text-brand/90">Unpaid</div>
-      <div class="text-brand text-xl font-bold">{{ unpaid }}</div>
-    </div>
-
   </div>
 </template>

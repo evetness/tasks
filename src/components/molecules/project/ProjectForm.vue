@@ -1,12 +1,3 @@
-<template>
-  <form @submit.prevent="submitForm" class="flex items-center text-brand/80 text-sm hover:bg-brand/20 focus:bg-brand/20 border-x border-transparent">
-    <Input name="name" type="text" v-model="form.name"/>
-    <button type="submit" class="btn hover:bg-brand/30">
-      <font-awesome-icon icon="fa-regular fa-floppy-disk" />
-    </button>
-  </form>
-</template>
-
 <script>
 import useVuelidate from '@vuelidate/core';
 import { required } from "@vuelidate/validators";
@@ -59,3 +50,15 @@ export default {
   }
 }
 </script>
+
+<template>
+  <form @submit.prevent="submitForm" class="flex items-center text-brand/80 text-sm hover:bg-brand/20 focus:bg-brand/20 border-x border-transparent">
+    <Input label="Name" name="name" type="text" v-model="form.name" :autofocus="true"/>
+    <button type="submit" class="btn hover:bg-brand/30">
+      <font-awesome-icon icon="fa-regular fa-floppy-disk" />
+    </button>
+    <button type="button" class="btn hover:bg-brand/30" @click="$emit('form:cancel')">
+      <font-awesome-icon icon="fa-solid fa-xmark" />
+    </button>
+  </form>
+</template>

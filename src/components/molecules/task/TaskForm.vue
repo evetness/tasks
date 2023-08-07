@@ -10,7 +10,7 @@ import Checkbox from '@/components/molecules/Checkbox.vue';
 
 export default {
   name: "TaskForm",
-  components: { Input, Checkbox, Checkbox },
+  components: { Input, Checkbox },
   props: ["id", "name", "start", "end"],
   setup() {
     return { v$: useVuelidate() }
@@ -79,7 +79,7 @@ export default {
     <td>
       <div class="flex item-center">
         <div class="flex shrink">
-          <Checkbox name="completed" />
+          <Checkbox name="completed" :autofocus="true" />
         </div>
         <div class="flex-1">
           <Input name="name" type="text" v-model="form.name" form="task-form"/>

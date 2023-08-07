@@ -1,3 +1,4 @@
+from apiflask import HTTPError
 from loguru import logger
 from sqlmodel import select, text
 
@@ -34,6 +35,7 @@ def create_wage(data: WageCreate) -> Wage:
     _wage = db.session.scalar(statement)
     if _wage:
         logger.warning(f"Wage Already Exists: {_wage.id} - {_wage.date} - {_wage.project_id}")
+        raise HTTPError(409, "Wage Already Exists")
     
     result = Wage(
         date=data.date,
@@ -52,6 +54,7 @@ def read_wage(ident: int) -> Wage:
     result = db.session.get(Wage, ident)
     if not result:
         logger.warning(f"Wage Not Exists: {ident}")
+        raise HTTPError(404, "Wage Not Exists")
     logger.debug(result)
 
     return result
@@ -61,14 +64,16 @@ def update_wage(ident: int, data: WageUpdate) -> Wage:
     logger.debug(ident)
     logger.debug(data)
 
-    statement = select(Wage).where(Wage.id != ident, Wage.date == data.date)
+    result = read_wage(ident)
+
+    statement = select(Wage).where(Wage.id != ident, Wage.date == data.date, Wage.project_id == result.project_id)
     logger.debug(statement)
 
     _wage = db.session.scalar(statement)
     if _wage:
         logger.warning(f"Wage Already Exists: {_wage.id} - {_wage.date}")
-    
-    result = read_wage(ident)
+        raise HTTPError(409, "Wage Already Exists")
+
     result.update(
         date=data.date,
         amount=data.amount,

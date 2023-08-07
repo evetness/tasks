@@ -5,7 +5,7 @@ import Label from "@/components/atoms/Label.vue";
 export default {
   name: "Input",
   inheritAttrs: false,
-  props: ['name', 'type', 'label', 'invalid', 'errors', 'modelValue'],
+  props: ["name", "type", "label", "invalid", "errors", "modelValue", "autofocus"],
   components: { FontAwesomeIcon, Label },
   emits: ["update:modelValue"],
   data() {
@@ -14,7 +14,9 @@ export default {
     }
   },
   mounted() {
-    this.$refs.input.focus()
+    if (this.autofocus) {
+      this.$refs.input.focus()
+    }
   },
   computed: {
     value: {
@@ -22,7 +24,7 @@ export default {
         return this.modelValue
       },
       set(value) {
-        this.$emit('update:modelValue', value)
+        this.$emit("update:modelValue", value)
       }
     }
   }
@@ -45,8 +47,8 @@ export default {
     </slot>
     <slot name="input">
       <input :id="id" :name="name" :type="type || 'text'" v-bind="$attrs" v-model="value" :class="{
-        'caret-red-500 focus:bg-red-500/30 text-red-500 hover:bg-red-500/30 placeholder:text-red-500/50': invalid,
-        'caret-brand focus:bg-brand/30 text-brand hover:bg-brand/30 placeholder:text-brand/50 autofill:!bg-brand': !invalid
+        'caret-red-500 focus:bg-red-500/20 text-red-500 hover:bg-red-500/20 placeholder:text-red-500/50': invalid,
+        'caret-brand focus:bg-brand/20 text-brand hover:bg-brand/20 placeholder:text-brand/50 autofill:!bg-brand': !invalid
       }" class="block w-full p-1.5 bg-transparent border-none text-sm tracking-normal" ref="input" />
     </slot>
     <div v-if="invalid" class="flex absolute inset-y-0 right-0 items-center pr-3 pointer-events-none">

@@ -59,7 +59,7 @@ body {
       border-y border-brand/70 hover:border-brand/90 focus:border-brand/90;
   }
   .btn-text {
-      @apply hover:bg-brand/20 focus:bg-brand/20;
+      @apply text-brand/80 hover:bg-brand/20 focus:bg-brand/20;
   }
 
   .btn-brand[disabled], .btn-text[disabled], .btn-brand[aria-disabled], .btn-text[aria-disabled] {
@@ -69,7 +69,6 @@ body {
       @apply text-brand/40 bg-brand/10 border-brand/20;
   }
   .btn-text[disabled] {
-      @apply text-stone-400;
+      @apply text-brand/40 bg-transparent;
   }
-
 }
