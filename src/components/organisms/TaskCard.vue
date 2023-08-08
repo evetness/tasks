@@ -1,11 +1,12 @@
 <script>
-import { mapState } from 'pinia'
+import { mapState, mapActions } from 'pinia'
 import { useProjectStore } from '@/stores/project'
 import axios from "axios";
 
-import { formatCurrency } from '@/utils';
-import TaskForm from '../molecules/task/TaskForm.vue';
-import TaskItem from '../molecules/task/TaskItem.vue';
+import TaskForm from '@/components/molecules/task/TaskForm.vue';
+import TaskItem from '@/components/molecules/task/TaskItem.vue';
+import {sortByDate} from "@/utils.js";
+import ProjectItem from "@/components/molecules/project/ProjectItem.vue";
 
 export default {
   name: "TaskCard",
@@ -13,7 +14,7 @@ export default {
     return {
       tasks: [],
       create: false,
-      edit: false
+      edit: 0
     };
   },
   computed: {
@@ -31,22 +32,26 @@ export default {
       const data = await response.data;
       this.tasks = data.items;
     },
-    formCreateSubmitted(task) {
+    async formCreateSubmitted(task) {
       this.create = false
-      this.tasks.unshift(task)
+      this.tasks.push(task)
+      this.tasks.sort((a, b) => sortByDate(a, b, "start"))
+      await this.getUnpaidSalary()
     },
-    formEditSubmitted(task) {
+    async formEditSubmitted(task) {
       const index = this.tasks.findIndex((obj => obj.id === task.id))
       this.tasks[index] = task
       this.edit = 0
+      await this.getUnpaidSalary()
     },
     async removeTask(id) {
       const response = await axios.delete(`/api/tasks/${id}`)
       if (response.status !== 204) return;
 
       this.tasks = this.tasks.filter((obj => obj.id !== id));
+      await this.getUnpaidSalary()
     },
-    formatCurrency,
+    ...mapActions(useProjectStore, ["getUnpaidSalary"])
   },
   mounted() {
     this.loadTasks();
@@ -58,7 +63,7 @@ export default {
       this.loadTasks();
     }
   },
-  components: { TaskForm, TaskItem }
+  components: {ProjectItem, TaskForm, TaskItem }
 }
 </script>
 
@@ -78,12 +83,12 @@ export default {
       <tbody class="text-brand/80">
         <template v-for="task in tasks" :key="task.id">
           <TaskItem v-if="edit !== task.id" :task="task"
-                    @task:edit="edit = task.id"
-                    @task:remove="removeTask"/>
+                    @task:edit="edit = task.id" :can-edit="!create && !edit"
+                    @task:remove="removeTask" :can-remove="!create && !edit"/>
           <TaskForm v-else :id="task.id" :name="task.name" :start="task.start" :end="task.end" :completed="task.completed"
-                    @form:submitted="formCreateSubmitted" @form:cancel="edit = 0"/>
+                    @form:submitted="formEditSubmitted" @form:cancel="edit = 0"/>
         </template>
-        <TaskForm v-if="create" @form:submitted="formEditSubmitted" @form:cancel="create = false"/>
+        <TaskForm v-if="create" @form:submitted="formCreateSubmitted" @form:cancel="create = false"/>
         <tr v-if="!create && !edit">
           <td colspan="6">
             <button type="button" class="btn btn-text text-sm uppercase w-full justify-center"

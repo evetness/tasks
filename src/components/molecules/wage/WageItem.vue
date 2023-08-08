@@ -7,7 +7,7 @@ import { formatCurrency } from "@/utils.js";
 
 export default {
   name: "WageItem",
-  props: ["wage"],
+  props: ["wage", "canEdit", "canRemove"],
   computed: {
     ...mapState(useProjectStore, { project: "id" })
   },
@@ -25,11 +25,13 @@ export default {
     <td class="text-xs text-right">{{ this.formatCurrency(wage.amount, wage.currency) }}</td>
     <td>
       <div class="flex items-center justify-end">
-        <button type="button" class="btn btn-text" @click="$emit('wage:edit', wage.id)">
+        <button type="button" class="btn btn-text" :disabled="!canEdit"
+                @click="$emit('wage:edit', wage.id)">
           <font-awesome-icon icon="fa-regular fa-pen-to-square" fixedWidth />
         </button>
   
-        <button type="button" class="btn btn-text" @click="$emit('wage:remove', wage.id)">
+        <button type="button" class="btn btn-text" :disabled="!canRemove"
+                @click="$emit('wage:remove', wage.id)">
           <font-awesome-icon icon="fa-regular fa-trash-can" fixedWidth />
         </button>
       </div>

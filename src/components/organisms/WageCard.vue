@@ -5,6 +5,7 @@ import axios from "axios";
 
 import WageForm from '@/components/molecules/wage/WageForm.vue';
 import WageItem from "@/components/molecules/wage/WageItem.vue";
+import { sortByDate } from "@/utils";
 
 export default {
   name: "WageCard",
@@ -23,10 +24,6 @@ export default {
       await this.getCurrentWage()
       await this.getUnpaidSalary()
     },
-    sortByDate(a, b) {
-      let da = new Date(a.date), db = new Date(b.date);
-      return db - da;
-    },
     async loadWages() {
       if (!this.project) return;
       const response = await axios.get(`/api/wages`, {
@@ -38,13 +35,13 @@ export default {
     async formCreateSubmitted(wage) {
       this.create = false
       this.wages.push(wage)
-      this.wages.sort(this.sortByDate)
+      this.wages.sort((a, b) => sortByDate(a, b, "date"))
       await this.reload()
     },
     async formEditSubmitted(wage) {
       const index = this.wages.findIndex((obj => obj.id === wage.id))
       this.wages[index] = wage
-      this.wages.sort(this.sortByDate)
+      this.wages.sort((a, b) => sortByDate(a, b, "date"))
       this.edit = 0
       await this.reload()
 
@@ -83,8 +80,8 @@ export default {
       <tbody class="text-brand/80">
         <template v-for="wage in wages" :key="wage.id">
           <WageItem v-if="edit !== wage.id" :wage="wage"
-                    @wage:edit="edit = wage.id"
-                    @wage:remove="removeWage"/>
+                    @wage:edit="edit = wage.id" :can-edit="!create && !edit"
+                    @wage:remove="removeWage" :can-remove="!create && !edit"/>
           <WageForm v-else :id="wage.id" :date="wage.date" :amount="wage.amount" :currency="wage.currency"
                     @form:submitted="formEditSubmitted" @form:cancel="edit = 0"/>
         </template>

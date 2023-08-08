@@ -7,7 +7,7 @@ import { formatCurrency } from '@/utils'
 
 export default {
   name: "TaskItem",
-  props: ["task"],
+  props: ["task", "canEdit", "canRemove"],
   computed: {
     elapsed() { return moment.duration(this.task.elapsed).humanize() },
     ...mapState(useProjectStore, { project: "id" })
@@ -37,11 +37,13 @@ export default {
     </td>
     <td>
       <div class="flex items-center justify-end">
-        <button type="button" class="btn btn-text" @click="$emit('task:edit', this.task.id)">
+        <button type="button" class="btn btn-text" :disabled="!canEdit"
+                @click="$emit('task:edit', this.task.id)">
           <font-awesome-icon icon="fa-regular fa-pen-to-square" fixedWidth />
         </button>
   
-        <button type="button" class="btn btn-text" @click="$emit('task:remove', this.task.id)">
+        <button type="button" class="btn btn-text" :disabled="!canRemove"
+                @click="$emit('task:remove', this.task.id)">
           <font-awesome-icon icon="fa-regular fa-trash-can" fixedWidth />
         </button>
       </div>

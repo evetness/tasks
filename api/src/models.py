@@ -40,24 +40,26 @@ class Task(Base, table=True):
     project: "Project" = Relationship(back_populates="tasks")
 
     @property
-    def elapsed(self) -> datetime.time:
+    def elapsed(self) -> str:
         if not self.end:
             return 0
         result = self.end - self.start
-        result = datetime.datetime.strptime(str(result), "%H:%M:%S")
-        return result.time()
+        hours = (result.days * 24) + result.seconds // 3600
+        minutes = (result.seconds // 60) % 60
+        return f"{hours}:{minutes}"
     
     @property
     def amount(self) -> float:
         wage = self.current_salary()
         if not wage:
             return 0.0
-        
+
+        hours, minutes = self.elapsed.split(":")
         elapsed = datetime.timedelta(
-            hours=self.elapsed.hour, 
-            minutes=self.elapsed.minute, 
-            seconds=self.elapsed.second)
-        return round((elapsed.seconds / HOUR) * wage.amount, 2)
+            hours=int(hours),
+            minutes=int(minutes),
+            seconds=0)
+        return round((elapsed.total_seconds() / HOUR) * wage.amount, 2)
     
     @property
     def currency(self) -> str | None:

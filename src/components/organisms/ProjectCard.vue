@@ -1,5 +1,5 @@
 <script>
-import {mapState, mapActions, mapWritableState} from 'pinia'
+import {mapState, mapActions} from 'pinia'
 import {useProjectStore} from '@/stores/project'
 
 import axios from "axios";
@@ -7,6 +7,7 @@ import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 import ProjectItem from '@/components/molecules/project/ProjectItem.vue';
 import ProjectForm from "@/components/molecules/project/ProjectForm.vue";
+import {sortByString} from "@/utils";
 
 export default {
   name: "ProjectCard",
@@ -15,21 +16,14 @@ export default {
     return {
       projects: [],
       edit: 0,
-      create: false
+      create: false,
+      group: 0
     }
   },
   computed: {
     ...mapState(useProjectStore, {selected: "id"})
   },
   methods: {
-    sortByName(a, b) {
-      let fa = a.name.toLowerCase(), fb = b.name.toLowerCase();
-
-      if (fa < fb) return -1;
-      if (fa > fb) return 1;
-
-      return 0;
-    },
     async loadProjects() {
       const response = await axios.get('/api/projects', {
         params: {order: "ASC", order_by: "name"}
@@ -47,14 +41,14 @@ export default {
     formCreateSubmitted(project) {
       this.create = false
       this.projects.push(project)
-      this.projects.sort(this.sortByName)
+      this.projects.sort((a, b) => sortByString(a, b, "name"))
       this.selectProject(project.id)
     },
     formEditSubmitted(project) {
       const index = this.projects.findIndex((obj => obj.id === project.id))
       this.projects[index] = project
-      this.projects.sort(this.sortByName)
-      if (this.edit !== project.id) {
+      this.projects.sort((a, b) => sortByString(a, b, "name"))
+      if (this.edit !== this.selected) {
         this.selectProject(project.id)
       } else {
         this.edit = 0
@@ -89,7 +83,7 @@ export default {
       </h1>
     </div>
 
-    <div class="space-y-1">
+    <div class="space-y-1 overflow-y-scroll">
       <template v-for="project in projects" :key="project.id">
         <ProjectItem v-if="edit !== project.id" :project="project" :selected="selected === project.id && !edit"
                      @project:select="selectProject(project.id)"
@@ -97,7 +91,7 @@ export default {
                      @project:remove="removeProject" :can-remove="!create && !edit"/>
 
         <ProjectForm v-else :id="project.id" :name="project.name"
-                     @form:submitted="formEditSubmitted" @form:cancel="formEditCancelled"/>
+                     @form:submitted="formEditSubmitted" @form:cancel="formEditCancelled(project.id)"/>
       </template>
       <ProjectForm v-if="create" @form:submitted="formCreateSubmitted" @form:cancel="this.create = false"/>
       <button v-if="!create" type="button" class="btn btn-text text-sm uppercase w-full justify-center"

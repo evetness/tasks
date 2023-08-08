@@ -5,7 +5,7 @@ export default {
   name: "ProjectItem",
   components: {ProjectWage},
   props: ["project", "selected", "canEdit", "canRemove"],
-  emits: ["project:select", "project:canEdit", "project:edit", "project:canRemove", "project:remove"]
+  emits: ["project:select", "project:edit", "project:remove"]
 }
 </script>
 

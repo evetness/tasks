@@ -28,7 +28,7 @@ class TaskBase(Base):
 @add_schema
 class TaskRead(TaskBase):
     id: int
-    elapsed: Time
+    elapsed: str
     amount: float
     currency: str
     completed: bool
