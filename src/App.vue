@@ -28,13 +28,13 @@ export default {
 </script>
 
 <template>
-  <div class="grid grid-cols-4 gap-6 w-full p-6 md:h-screen">
-    <div class="col-span-1">
+  <div class="grid grid-cols-4 gap-6 w-full p-6 md:h-screen overflow-hidden">
+    <div class="md:h-auto col-span-1">
       <ProjectCard/>
     </div>
 
-    <div class="col-span-3">
-      <div class="h-full flex flex-col card">
+    <div class="col-span-3 overflow-hidden">
+      <div class="flex flex-col card h-full">
         <ul class="flex flex-wrap text-sm font-medium text-center border-b border-brand/60 space-x-1 -mt-3 -mx-3 mb-3">
           <li>
             <button type="button" class="inline-block p-4 uppercase" :class="{

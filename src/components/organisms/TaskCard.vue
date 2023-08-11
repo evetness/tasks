@@ -27,7 +27,7 @@ export default {
       if (!this.project) return;
 
       const response = await axios.get('/api/tasks', {
-        params: { project_id: this.project, order_by: 'start', order: 'desc' }
+        params: { page: 1, per_page: 0, order_by: 'start', order: 'desc', project_id: this.project }
       });
       const data = await response.data;
       this.tasks = data.items;
@@ -68,36 +68,40 @@ export default {
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
-    <table class="w-full text-sm">
-      <thead class="text-brand/70">
-        <tr>
-          <th class="w-[40%] text-left">Status / Description</th>
-          <th class="w-[13%] text-right">Start</th>
-          <th class="w-[13%] text-right">End</th>
-          <th class="w-[12%] text-right">Elapsed</th>
-          <th class="w-[12%] text-right">Amount</th>
-          <th class="w-[10%] text-right">Actions</th>
-        </tr>
-      </thead>
-      <tbody class="text-brand/80">
-        <template v-for="task in tasks" :key="task.id">
-          <TaskItem v-if="edit !== task.id" :task="task"
-                    @task:edit="edit = task.id" :can-edit="!create && !edit"
-                    @task:remove="removeTask" :can-remove="!create && !edit"/>
-          <TaskForm v-else :id="task.id" :name="task.name" :start="task.start" :end="task.end" :completed="task.completed"
-                    @form:submitted="formEditSubmitted" @form:cancel="edit = 0"/>
-        </template>
-        <TaskForm v-if="create" @form:submitted="formCreateSubmitted" @form:cancel="create = false"/>
-        <tr v-if="!create && !edit">
-          <td colspan="6">
-            <button type="button" class="btn btn-text text-sm uppercase w-full justify-center"
-                    :disabled="edit || !project" @click="create = !create">
-              <font-awesome-icon icon="fa-solid fa-plus" />
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="flex flex-col overflow-hidden">
+    <div class="overflow-y-scroll">
+      <table class="w-full text-sm">
+        <thead class="text-brand/70">
+          <tr class="sticky top-0 bg-[#3e3121]">
+            <th class="w-[30%] text-left">Status / Description</th>
+            <th class="w-[20%] text-right">Start</th>
+            <th class="w-[20%] text-right">End</th>
+            <th class="w-[10%] text-right">Elapsed</th>
+            <th class="w-[10%] text-right">Amount</th>
+            <th class="w-[10%] text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="text-brand/80">
+          <template v-for="task in tasks" :key="task.id">
+            <TaskItem v-if="edit !== task.id" :task="task"
+                      @task:edit="edit = task.id" :can-edit="!create && !edit"
+                      @task:remove="removeTask" :can-remove="!create && !edit"/>
+            <TaskForm v-else :id="task.id" :name="task.name" :start="task.start" :end="task.end" :completed="task.completed"
+                      @form:submitted="formEditSubmitted" @form:cancel="edit = 0"/>
+          </template>
+        </tbody>
+        <tfoot class="sticky bottom-0 bg-[#3e3121]">
+          <TaskForm v-if="create" @form:submitted="formCreateSubmitted" @form:cancel="create = false"/>
+          <tr v-if="!create && !edit">
+            <td colspan="6">
+              <button type="button" class="btn btn-text text-sm uppercase w-full justify-center"
+                      :disabled="edit || !project" @click="create = !create">
+                <font-awesome-icon icon="fa-solid fa-plus" />
+              </button>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
   </div>
 </template>

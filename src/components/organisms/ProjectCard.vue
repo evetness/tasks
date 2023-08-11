@@ -26,7 +26,7 @@ export default {
   methods: {
     async loadProjects() {
       const response = await axios.get('/api/projects', {
-        params: {order: "ASC", order_by: "name"}
+        params: {page: 1, per_page: 0, order: "ASC", order_by: "name"}
       })
       const data = await response.data
       this.projects = data.items

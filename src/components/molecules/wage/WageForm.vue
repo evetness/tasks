@@ -6,7 +6,7 @@ import useVuelidate from '@vuelidate/core';
 import { required, decimal } from "@vuelidate/validators";
 
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import Input from '@/components/molecules/Input.vue'
+import Input from '@/components/atoms/Input.vue'
 
 export default {
   name: "WageForm",

@@ -42,7 +42,7 @@ class Task(Base, table=True):
     @property
     def elapsed(self) -> str:
         if not self.end:
-            return 0
+            return "00:00"
         result = self.end - self.start
         hours = (result.days * 24) + result.seconds // 3600
         minutes = (result.seconds // 60) % 60

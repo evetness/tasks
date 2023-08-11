@@ -5,8 +5,8 @@ import { useProjectStore } from '@/stores/project'
 import useVuelidate from '@vuelidate/core';
 import { required } from "@vuelidate/validators";
 
-import Input from '@/components/molecules/Input.vue';
-import Checkbox from '@/components/molecules/Checkbox.vue';
+import Input from '@/components/atoms/Input.vue';
+import Checkbox from '@/components/atoms/Checkbox.vue';
 
 export default {
   name: "TaskForm",
@@ -34,6 +34,7 @@ export default {
   validators() {
     return {
       form: {
+        completed: { required, $autoDirty: true },
         name: { required, $autoDirty: true },
         start: { required, $autoDirty: true },
         end: { required, $autoDirty: true }
@@ -44,10 +45,12 @@ export default {
     async submitForm() {
       if (this.v$.$invalid === false) {
         let response = null
+        console.log(this.form)
         if (this.id) {
           response = await this.axios.put(
             `/api/tasks/${this.id}`,
             {
+              completed: this.form.completed,
               name: this.form.name,
               start: this.form.start,
               end: this.form.end
@@ -57,6 +60,7 @@ export default {
           response = await this.axios.post(
             `/api/tasks`,
             {
+              completed: this.form.completed,
               name: this.form.name,
               start: this.form.start,
               end: this.form.end,
@@ -76,14 +80,14 @@ export default {
 </script>
 
 <template>
-  <tr class="hover:bg-brand/10">
+  <tr>
     <td>
       <div class="flex item-center">
         <div class="flex shrink">
-          <Checkbox name="completed" :autofocus="true" />
+          <Checkbox name="completed" v-model="form.completed"/>
         </div>
         <div class="flex-1">
-          <Input name="name" type="text" v-model="form.name" form="task-form"/>
+          <Input name="name" type="text" :autofocus="true" v-model="form.name" form="task-form"/>
         </div>
       </div>
     </td>

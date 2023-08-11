@@ -13,13 +13,14 @@ Time = NewType("Time", str, field=fields.Time)
 @dataclass
 @add_schema
 class TaskBase(Base):
+    completed: bool
     name: str | None
     start: datetime.datetime
     end: datetime.datetime | None
 
     @validates_schema
     def validate_task(self, data, **kwargs):
-        # Validate the end date to be later then the start date
+        # Validate the end date to be later than the start date
         if data["end"] is not None and data["end"] <= data["start"]:
             raise ValidationError("The end date must be later then the start date")
 
@@ -31,7 +32,6 @@ class TaskRead(TaskBase):
     elapsed: str
     amount: float
     currency: str
-    completed: bool
 
 
 @dataclass

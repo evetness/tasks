@@ -17,6 +17,7 @@ def create_task(data: TaskCreate) -> Task:
         logger.warning(f"Task Already Exists: {_task.id} - {_task.start} - {_task.end}")
     
     result = Task(
+        completed=data.completed,
         name=data.name,
         start=data.start,
         end=data.end,
@@ -71,6 +72,7 @@ def update_task(ident: int, data: TaskUpdate):
     
     result = read_task(ident)
     result.update(
+        completed=data.completed,
         name=data.name,
         start=data.start,
         end=data.end

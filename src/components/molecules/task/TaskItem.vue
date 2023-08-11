@@ -32,7 +32,7 @@ export default {
     <td class="text-xs text-right">{{ this.moment(task.start).format("lll") }}</td>
     <td class="text-xs text-right">{{ this.moment(task.end).format("lll") }}</td>
     <td class="text-xs text-right text-brand">{{ elapsed }}</td>
-    <td class="text-xs text-right text-brand tracking-thighter font-extrabold group-hover:text-sm pr-1 transition-all">
+    <td class="text-xs text-right text-brand tracking-thighter font-extrabold group-hover:scale-125 pr-1 transition-all">
       {{ formatCurrency(task.amount, task.currency) }}
     </td>
     <td>

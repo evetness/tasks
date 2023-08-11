@@ -68,33 +68,35 @@ export default {
 </script>
 
 <template>
-  <div class="flex flex-col h-full">
-    <table class="w-full text-sm">
-      <thead class="text-brand/70">
-        <tr>
-          <th class="w-[40%] text-left">Since</th>
-          <th class="w-[30%] text-right">Amount</th>
-          <th class="w-[20%] text-right">Actions</th>
-        </tr>
-      </thead>
-      <tbody class="text-brand/80">
-        <template v-for="wage in wages" :key="wage.id">
-          <WageItem v-if="edit !== wage.id" :wage="wage"
-                    @wage:edit="edit = wage.id" :can-edit="!create && !edit"
-                    @wage:remove="removeWage" :can-remove="!create && !edit"/>
-          <WageForm v-else :id="wage.id" :date="wage.date" :amount="wage.amount" :currency="wage.currency"
-                    @form:submitted="formEditSubmitted" @form:cancel="edit = 0"/>
-        </template>
-        <WageForm v-if="create" @form:submitted="formCreateSubmitted" @form:cancel="create = false"/>
-        <tr v-if="!create && !edit">
-          <td colspan="3">
-            <button type="button" class="btn btn-text text-sm uppercase w-full justify-center"
-                    :disabled="edit || !project" @click="create = !create">
-              <font-awesome-icon icon="fa-solid fa-plus" />
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="flex flex-col overflow-hidden">
+    <div class="overflow-y-scroll">
+      <table class="w-full text-sm">
+        <thead class="text-brand/70">
+          <tr>
+            <th class="w-[40%] text-left">Since</th>
+            <th class="w-[30%] text-right">Amount</th>
+            <th class="w-[20%] text-right">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="text-brand/80">
+          <template v-for="wage in wages" :key="wage.id">
+            <WageItem v-if="edit !== wage.id" :wage="wage"
+                      @wage:edit="edit = wage.id" :can-edit="!create && !edit"
+                      @wage:remove="removeWage" :can-remove="!create && !edit"/>
+            <WageForm v-else :id="wage.id" :date="wage.date" :amount="wage.amount" :currency="wage.currency"
+                      @form:submitted="formEditSubmitted" @form:cancel="edit = 0"/>
+          </template>
+          <WageForm v-if="create" @form:submitted="formCreateSubmitted" @form:cancel="create = false"/>
+          <tr v-if="!create && !edit">
+            <td colspan="3">
+              <button type="button" class="btn btn-text text-sm uppercase w-full justify-center"
+                      :disabled="edit || !project" @click="create = !create">
+                <font-awesome-icon icon="fa-solid fa-plus" />
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>

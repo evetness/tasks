@@ -5,7 +5,6 @@ import moment from "moment/min/moment-with-locales";
 
 export default {
   name: "ProjectWage",
-  props: [],
   methods: {
     moment,
     ...mapActions(useProjectStore, ["getCurrentWage", "getUnpaidSalary"])
@@ -13,7 +12,7 @@ export default {
   computed: {
     ...mapState(useProjectStore, ["wage", "amount", "unpaid"])
   },
-  async mounted() {
+  async created() {
     await this.getCurrentWage()
     await this.getUnpaidSalary()
   }

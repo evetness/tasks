@@ -1,7 +1,7 @@
 <script>
 import useVuelidate from '@vuelidate/core';
 import { required } from "@vuelidate/validators";
-import Input from '@/components/molecules/Input.vue';
+import Input from '@/components/atoms/Input.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 
 export default {
