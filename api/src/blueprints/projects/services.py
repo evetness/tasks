@@ -105,7 +105,7 @@ def calculate_unpaid_wage(ident: int) -> Unpaid | None:
     project = read_project(ident)
 
     statement = select(Task) \
-        .where(Task.project_id == project.id)
+        .where(Task.project_id == project.id, Task.completed == 0)
     logger.debug(statement)
 
     result = db.session.scalars(statement).all()
