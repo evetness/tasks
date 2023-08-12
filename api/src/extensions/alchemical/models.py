@@ -78,7 +78,7 @@ class Pagination:
     def items(self) -> list:
         return db.session.scalars(
             self._statement.limit(self._limit).offset(self._offset)
-        ).all()
+        ).unique().all()
 
     @property
     def total(self) -> int:

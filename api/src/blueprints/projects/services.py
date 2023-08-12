@@ -108,18 +108,18 @@ def calculate_unpaid_wage(ident: int) -> Unpaid | None:
         .where(Task.project_id == project.id, Task.completed == 0)
     logger.debug(statement)
 
-    result = db.session.scalars(statement).all()
+    result = db.session.scalars(statement).unique().all()
     logger.debug(result)
 
     if not result:
         logger.warning(f"Project Tasks Not Exists: {ident}")
         return None
     
-    current_salary = project_current_salary(project.id)
+    task: Task = next(iter(result))
 
     return Unpaid(
         amount=round(sum(task.amount for task in result), 2),
-        currency=current_salary.currency if current_salary else None
+        currency=task.currency
     )
 
 

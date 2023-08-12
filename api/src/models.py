@@ -1,10 +1,8 @@
 import datetime
 from typing import List, Optional
-from loguru import logger
 
-from sqlmodel import Field, Relationship, select, col
+from sqlmodel import Field, Relationship
 from src.constants import HOUR
-from src.extensions import db, cache
 from src.extensions.alchemical.models import Base
 
 
@@ -39,6 +37,15 @@ class Task(Base, table=True):
     project_id: int = Field(foreign_key="project.id")
     project: "Project" = Relationship(back_populates="tasks")
 
+    wage: Optional["Wage"] = Relationship(
+        sa_relationship_kwargs=dict(
+            primaryjoin="(foreign(Wage.date) <= Task.start) & (foreign(Wage.project_id) == Task.project_id)",
+            lazy="joined",
+            uselist=False,
+            backref="tasks"
+        )
+    )
+
     @property
     def elapsed(self) -> str:
         if not self.end:
@@ -50,8 +57,7 @@ class Task(Base, table=True):
     
     @property
     def amount(self) -> float:
-        wage = self.current_salary()
-        if not wage:
+        if not self.wage:
             return 0.0
 
         hours, minutes = self.elapsed.split(":")
@@ -59,25 +65,10 @@ class Task(Base, table=True):
             hours=int(hours),
             minutes=int(minutes),
             seconds=0)
-        return round((elapsed.total_seconds() / HOUR) * wage.amount, 2)
+        return round((elapsed.total_seconds() / HOUR) * self.wage.amount, 2)
     
     @property
     def currency(self) -> str | None:
-        wage = self.current_salary()
-        if not wage:
+        if not self.wage:
             return None
-        return wage.currency
-
-    @cache.memoize(5)
-    def current_salary(self) -> Wage | None:
-        statement = select(Wage) \
-            .where(
-                Wage.date <= self.start.date(), 
-                Wage.project_id == self.project_id) \
-            .order_by(col(Wage.date).desc())
-        logger.debug(statement)
-
-        result = db.session.scalar(statement)
-        logger.debug(result)
-
-        return result
+        return self.wage.currency
