@@ -7,16 +7,18 @@ import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 import ProjectItem from '@/components/molecules/project/ProjectItem.vue';
 import ProjectForm from "@/components/molecules/project/ProjectForm.vue";
+import ProjectRemove from '@/components/molecules/project/ProjectRemove.vue';
 import {sortByString} from "@/utils";
 
 export default {
   name: "ProjectCard",
-  components: {FontAwesomeIcon, ProjectItem, ProjectForm},
+  components: { FontAwesomeIcon, ProjectItem, ProjectForm, ProjectRemove },
   data() {
     return {
       projects: [],
-      edit: 0,
       create: false,
+      edit: 0,
+      remove: 0,
       group: 0
     }
   },
@@ -61,6 +63,10 @@ export default {
         this.edit = 0
       }
     },
+    formRemoveSubmitted(id) {
+      this.projects = this.projects.filter((obj => obj.id !== id));
+      if (id === this.selected) this.selectProject(0);
+    },
     ...mapActions(useProjectStore, {selectProject: "selectProject"})
   },
   async mounted() {
@@ -70,6 +76,7 @@ export default {
     selected() {
       this.edit = 0;
       this.create = false;
+      this.remove = 0;
     }
   }
 }
@@ -85,13 +92,16 @@ export default {
 
     <div class="space-y-1 overflow-y-scroll">
       <template v-for="project in projects" :key="project.id">
-        <ProjectItem v-if="edit !== project.id" :project="project" :selected="selected === project.id && !edit"
+        <ProjectItem v-if="edit !== project.id && remove !== project.id" :project="project" :selected="selected === project.id && !edit"
                      @project:select="selectProject(project.id)"
                      @project:edit="edit = project.id" :can-edit="!create && !edit"
-                     @project:remove="removeProject" :can-remove="!create && !edit"/>
+                     @project:remove="remove = project.id" :can-remove="!create && !edit"/>
 
-        <ProjectForm v-else :id="project.id" :name="project.name"
+        <ProjectForm v-if="edit === project.id" :id="project.id" :name="project.name"
                      @form:submitted="formEditSubmitted" @form:cancel="formEditCancelled(project.id)"/>
+        
+        <ProjectRemove v-if="remove === project.id" :id="project.id" :name="project.name" 
+                       @form:submitted="formRemoveSubmitted" @form:cancel="remove = 0"/>
       </template>
       <ProjectForm v-if="create" @form:submitted="formCreateSubmitted" @form:cancel="this.create = false"/>
       <button v-if="!create" type="button" class="btn btn-text text-sm uppercase w-full justify-center"

@@ -29,7 +29,7 @@ export default {
 
 <template>
   <div class="grid grid-cols-4 gap-6 w-full p-6 md:h-screen overflow-hidden">
-    <div class="md:h-auto col-span-1">
+    <div class="col-span-1 overflow-hidden">
       <ProjectCard/>
     </div>
 

@@ -7,7 +7,7 @@ import { formatCurrency } from '@/utils'
 
 export default {
   name: "TaskItem",
-  props: ["task", "canEdit", "canRemove"],
+  props: ["task", "disabled"],
   computed: {
     elapsed() { return moment.duration(this.task.elapsed).humanize() },
     ...mapState(useProjectStore, { project: "id" })
@@ -32,17 +32,19 @@ export default {
     <td class="text-xs text-right">{{ this.moment(task.start).format("lll") }}</td>
     <td class="text-xs text-right">{{ this.moment(task.end).format("lll") }}</td>
     <td class="text-xs text-right text-brand">{{ elapsed }}</td>
-    <td class="text-xs text-right text-brand tracking-thighter font-extrabold group-hover:scale-125 pr-1 transition-all">
+    <td class="text-xs text-right text-brand tracking-thighter font-extrabold" :class="{
+      'group-hover:scale-125 pr-1 transition-all': task.amount
+    }">
       {{ formatCurrency(task.amount, task.currency) }}
     </td>
     <td>
       <div class="flex items-center justify-end">
-        <button type="button" class="btn btn-text" :disabled="!canEdit"
+        <button type="button" class="btn btn-text" :disabled="disabled"
                 @click="$emit('task:edit', this.task.id)">
           <font-awesome-icon icon="fa-regular fa-pen-to-square" fixedWidth />
         </button>
   
-        <button type="button" class="btn btn-text" :disabled="!canRemove"
+        <button type="button" class="btn btn-text" :disabled="disabled"
                 @click="$emit('task:remove', this.task.id)">
           <font-awesome-icon icon="fa-regular fa-trash-can" fixedWidth />
         </button>

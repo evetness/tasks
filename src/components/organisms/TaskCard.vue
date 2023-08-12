@@ -7,6 +7,7 @@ import TaskForm from '@/components/molecules/task/TaskForm.vue';
 import TaskItem from '@/components/molecules/task/TaskItem.vue';
 import {sortByDate} from "@/utils.js";
 import ProjectItem from "@/components/molecules/project/ProjectItem.vue";
+import TaskRemove from '../molecules/task/TaskRemove.vue';
 
 export default {
   name: "TaskCard",
@@ -14,10 +15,16 @@ export default {
     return {
       tasks: [],
       create: false,
-      edit: 0
+      edit: 0,
+      remove: 0
     };
   },
   computed: {
+    groups() {
+      if (!this.tasks) return
+
+
+    },
     ...mapState(useProjectStore, {
       project: "id"
     })
@@ -44,10 +51,7 @@ export default {
       this.edit = 0
       await this.getUnpaidSalary()
     },
-    async removeTask(id) {
-      const response = await axios.delete(`/api/tasks/${id}`)
-      if (response.status !== 204) return;
-
+    async formRemoveSubmitted(id) {
       this.tasks = this.tasks.filter((obj => obj.id !== id));
       await this.getUnpaidSalary()
     },
@@ -63,7 +67,7 @@ export default {
       this.loadTasks();
     }
   },
-  components: {ProjectItem, TaskForm, TaskItem }
+  components: { ProjectItem, TaskForm, TaskItem, TaskRemove }
 }
 </script>
 
@@ -83,16 +87,18 @@ export default {
         </thead>
         <tbody class="text-brand/80">
           <template v-for="task in tasks" :key="task.id">
-            <TaskItem v-if="edit !== task.id" :task="task"
-                      @task:edit="edit = task.id" :can-edit="!create && !edit"
-                      @task:remove="removeTask" :can-remove="!create && !edit"/>
-            <TaskForm v-else :id="task.id" :name="task.name" :start="task.start" :end="task.end" :completed="task.completed"
+            <TaskItem v-if="edit !== task.id && remove !== task.id" :task="task"
+                      @task:edit="edit = task.id" @task:remove="remove = task.id" 
+                      :disabled="create || edit || remove"/>
+            <TaskForm v-if="edit === task.id" :id="task.id" :name="task.name" :start="task.start" :end="task.end" :completed="task.completed"
                       @form:submitted="formEditSubmitted" @form:cancel="edit = 0"/>
+            <TaskRemove v-if="remove === task.id" :id="task.id" :name="task.name" :start="task.start" 
+                        @form:submitted="formRemoveSubmitted" @form:cancel="remove = 0"/>
           </template>
         </tbody>
         <tfoot class="sticky bottom-0 bg-[#3e3121]">
           <TaskForm v-if="create" @form:submitted="formCreateSubmitted" @form:cancel="create = false"/>
-          <tr v-if="!create && !edit">
+          <tr v-if="!create && !edit && !remove">
             <td colspan="6">
               <button type="button" class="btn btn-text text-sm uppercase w-full justify-center"
                       :disabled="edit || !project" @click="create = !create">

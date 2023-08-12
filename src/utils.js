@@ -1,9 +1,10 @@
 export function formatCurrency(amount, currency) {
+  if (!currency || !amount) return "-";
   const formatter = new Intl.NumberFormat('hu-HU', {
     style: 'currency',
     currency: currency,
   });
-  return formatter.format(amount)
+  return formatter.format(amount);
 }
 
 export function sortByDate(a, b, field) {
