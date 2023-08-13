@@ -29,7 +29,7 @@ export default {
       project: "id"
     })
   },
-  validators() {
+  validations() {
     return {
       form: {
         date: {required, $autoDirty: true},
@@ -76,17 +76,17 @@ export default {
 <template>
   <tr>
     <td>
-      <Input label="Since" name="date" type="date" v-model="form.date" :autofocus="true" form="wage-form"/>
+      <Input label="Since" name="date" type="date" v-model="form.date" :autofocus="true" form="wage-form" :errors="v$.form.date.$errors"/>
     </td>
     <td>
       <div class="flex">
-        <Input label="Amount" name="amount" type="number" v-model="form.amount" min="0" class="text-right" form="wage-form"/>
-        <Input label="Currency" name="currency" type="text" v-model="form.currency" maxlength="3" form="wage-form"/>
+        <Input label="Amount" name="amount" type="number" v-model="form.amount" min="0" class="text-right" form="wage-form" :errors="v$.form.amount.$errors"/>
+        <Input label="Currency" name="currency" type="text" v-model="form.currency" maxlength="3" form="wage-form" :errors="v$.form.currency.$errors"/>
       </div>
     </td>
     <td>
       <form id="wage-form" @submit.prevent="submitForm" class="flex items-center justify-end">
-        <button type="submit" class="btn btn-text">
+        <button type="submit" class="btn btn-text" :disabled="v$.$invalid">
           <font-awesome-icon icon="fa-regular fa-floppy-disk" fixedWidth />
         </button>
         <button type="button" class="btn btn-text" @click="$emit('form:cancel')">

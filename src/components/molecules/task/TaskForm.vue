@@ -31,7 +31,7 @@ export default {
       project: "id"
     })
   },
-  validators() {
+  validations() {
     return {
       form: {
         completed: { required, $autoDirty: true },
@@ -84,24 +84,24 @@ export default {
     <td>
       <div class="flex item-center">
         <div class="flex shrink">
-          <Checkbox name="completed" v-model="form.completed"/>
+          <Checkbox name="completed" v-model="form.completed" :errors="v$.form.completed.$errors"/>
         </div>
         <div class="flex-1">
-          <Input name="name" type="text" :autofocus="true" v-model="form.name" form="task-form"/>
+          <Input name="name" type="text" :autofocus="true" v-model="form.name" form="task-form" :errors="v$.form.name.$errors"/>
         </div>
       </div>
     </td>
     <td>
-      <Input name="start" type="datetime-local" v-model="form.start" form="task-form"/>
+      <Input name="start" type="datetime-local" v-model="form.start" form="task-form" :errors="v$.form.start.$errors"/>
     </td>
     <td>
-      <Input name="end" type="datetime-local" v-model="form.end" form="task-form"/>
+      <Input name="end" type="datetime-local" v-model="form.end" form="task-form" :errors="v$.form.end.$errors"/>
     </td>
     <td></td>
     <td></td>
     <td>
       <form id="task-form" @submit.prevent="submitForm" class="flex items-center justify-end">
-        <button type="submit" class="btn btn-text">
+        <button type="submit" class="btn btn-text" :disabled="v$.$invalid">
           <font-awesome-icon icon="fa-regular fa-floppy-disk" fixedWidth />
         </button>
         <button type="button" class="btn btn-text" @click="$emit('form:cancel')">

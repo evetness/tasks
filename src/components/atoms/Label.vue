@@ -1,7 +1,7 @@
 <script>
 export default {
   name: "Label",
-  props: ["for", "disabled", "error"],
+  props: ["for", "disabled"],
   data() {
     return {
       id: `${this.for}-input`,
@@ -13,8 +13,7 @@ export default {
 <template>
     <label :for="id" :class="{
       'text-stone-500/80': disabled,
-      'text-red-500/80': error,
-      'text-brand/80': !disabled && !error
+      'text-brand/80': !disabled
     }" class="font-medium">
         <slot></slot>
     </label>
