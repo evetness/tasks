@@ -1,7 +1,7 @@
 <script>
-import {mapState, mapActions} from 'pinia'
-import {useProjectStore} from '@/stores/project'
-import {useGlobalStore} from '@/stores/global'
+import { mapState, mapActions } from 'pinia'
+import { useProjectStore } from '@/stores/project'
+import { useGlobalStore } from '@/stores/global'
 
 import axios from "axios";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
@@ -13,7 +13,7 @@ import ProjectSkeleton from '@/components/molecules/project/ProjectSkeleton.vue'
 import {sortByString} from "@/utils";
 
 export default {
-  name: "ProjectCard",
+  name: "ProjectList",
   components: { FontAwesomeIcon, ProjectItem, ProjectForm, ProjectRemove, ProjectSkeleton },
   data() {
     return {
@@ -24,13 +24,13 @@ export default {
     }
   },
   computed: {
-    ...mapState(useProjectStore, {selected: "id"}),
-    ...mapState(useGlobalStore, {inAction: "inAction"})
+    ...mapState(useProjectStore, { selected: "id" }),
+    ...mapState(useGlobalStore, { inAction: "inAction" })
   },
   methods: {
     async loadProjects() {
       const response = await axios.get('/api/projects', {
-        params: {page: 1, per_page: 0, order: "ASC", order_by: "name"}
+        params: { page: 1, per_page: 0, order: "ASC", order_by: "name" }
       })
       const data = await response.data
       this.projects = data.items
@@ -70,8 +70,8 @@ export default {
       this.projects = this.projects.filter((obj => obj.id !== id));
       if (id === this.selected) this.selectProject(0);
     },
-    ...mapActions(useProjectStore, {selectProject: "selectProject"}),
-    ...mapActions(useGlobalStore, {toggleAction: "toggleAction"})
+    ...mapActions(useProjectStore, { selectProject: "selectProject" }),
+    ...mapActions(useGlobalStore, { toggleAction: "toggleAction" })
   },
   async mounted() {
     await this.loadProjects()
@@ -87,31 +87,23 @@ export default {
 </script>
 
 <template>
-  <div class="h-full flex flex-col gap-3 card">
-    <div class="flex items-center justify-between">
-      <h1 class="font-medium text-lg md:text-xl leading-none text-brand/80 uppercase">
-        Projects
-      </h1>
-    </div>
+  <div class="space-y-1 overflow-y-scroll">
+    <template v-for="project in projects" :key="project.id">
+      <ProjectItem v-if="edit !== project.id && remove !== project.id" :project="project"
+        :selected="selected === project.id && !edit" @project:select="selectProject(project.id)"
+        @project:edit="edit = project.id" :can-edit="!inAction" @project:remove="remove = project.id"
+        :can-remove="!inAction" />
 
-    <div class="space-y-1 overflow-y-scroll">
-          <template v-for="project in projects" :key="project.id">
-            <ProjectItem v-if="edit !== project.id && remove !== project.id" :project="project" :selected="selected === project.id && !edit"
-                         @project:select="selectProject(project.id)"
-                         @project:edit="edit = project.id" :can-edit="!inAction"
-                         @project:remove="remove = project.id" :can-remove="!inAction"/>
-    
-            <ProjectForm v-if="edit === project.id" :id="project.id" :name="project.name"
-                         @form:submitted="formEditSubmitted" @form:cancel="formEditCancelled(project.id)"/>
-            
-            <ProjectRemove v-if="remove === project.id" :id="project.id" :name="project.name" 
-                           @form:submitted="formRemoveSubmitted" @form:cancel="remove = 0"/>
-          </template>
-      <ProjectForm v-if="create" @form:submitted="formCreateSubmitted" @form:cancel="this.create = false"/>
-      <button v-if="!create" type="button" class="btn btn-text text-sm uppercase w-full justify-center"
-              @click="create = !create; toggleAction(!inAction)" :disabled="inAction">
-        <font-awesome-icon icon="fa-solid fa-plus" />
-      </button>
-    </div>
+      <ProjectForm v-if="edit === project.id" :id="project.id" :name="project.name" @form:submitted="formEditSubmitted"
+        @form:cancel="formEditCancelled(project.id)" />
+
+      <ProjectRemove v-if="remove === project.id" :id="project.id" :name="project.name"
+        @form:submitted="formRemoveSubmitted" @form:cancel="remove = 0" />
+    </template>
+    <ProjectForm v-if="create" @form:submitted="formCreateSubmitted" @form:cancel="this.create = false" />
+    <button v-if="!create" type="button" class="btn btn-text text-sm uppercase w-full justify-center"
+      @click="create = !create; toggleAction(!inAction)" :disabled="inAction">
+      <font-awesome-icon icon="fa-solid fa-plus" />
+    </button>
   </div>
 </template>

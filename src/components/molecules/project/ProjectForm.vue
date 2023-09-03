@@ -38,16 +38,20 @@ export default {
           response = await this.axios.put(
             `/api/projects/${this.id}`,
             { name: this.form.name }
-          )
+          ).catch((error) => {
+            if (error.response.status === 409) {
+              Object.assign(this.vuelidateExternalResults, { form: { name: error.response.data.message }})
+            }
+          })
         } else {
           response = await this.axios.post(
             `/api/projects`,
             { name: this.form.name }
-          )
-        }
-        // TODO backend error validate form
-        if (response.status !== 200) {
-          return
+          ).catch((error) => {
+            if (error.response.status === 409) {
+              Object.assign(this.vuelidateExternalResults, { form: { name: error.response.data.message }})
+            }
+          })
         }
         const data = await response.data
         this.$emit('form:submitted', data)
@@ -60,10 +64,10 @@ export default {
 <template>
   <form @submit.prevent="submitForm" class="flex items-center text-brand/80 text-sm hover:bg-brand/20 focus:bg-brand/20 border-x border-transparent">
     <Input label="Name" name="name" type="text" v-model="form.name" :autofocus="true" :errors="v$.form.name.$errors"/>
-    <button type="submit" class="btn btn-text" :disabled="v$.$invalid">
+    <button type="submit" class="btn btn-text" :disabled="v$.$invalid" title="Submit">
       <font-awesome-icon icon="fa-regular fa-floppy-disk" fixedWidth />
     </button>
-    <button type="button" class="btn btn-text" @click="$emit('form:cancel')">
+    <button type="button" class="btn btn-text" @click="$emit('form:cancel')" title="Cancel">
       <font-awesome-icon icon="fa-solid fa-xmark" fixedWidth />
     </button>
   </form>
