@@ -11,7 +11,8 @@ export default {
       if (response.status !== 204) return;
       this.$emit('form:submitted', this.id)
     }
-  }
+  },
+  components: {FontAwesomeIcon}
 }
 </script>
 

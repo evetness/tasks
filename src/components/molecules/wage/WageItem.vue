@@ -1,7 +1,10 @@
 <script>
 import moment from 'moment/min/moment-with-locales'
+
 import { mapState } from 'pinia'
 import { useProjectStore } from '@/stores/project'
+
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 import { formatCurrency } from "@/utils.js";
 
@@ -15,7 +18,8 @@ export default {
     formatCurrency,
     moment
   },
-  emits: ["wage:edit", "wage:remove"]
+  emits: ["wage:edit", "wage:remove"],
+  components: {FontAwesomeIcon}
 }
 </script>
 

@@ -17,7 +17,7 @@ export default {
             'border-brand/60 bg-brand/10': selected
          }"
     >
-      <button type="button" class="w-full py-2 px-3 text-left text-brand"
+      <button type="button" class="w-full py-2 px-3 text-left text-brand break-all"
               @click="$emit('project:select', project.id)">
         {{ project.name }}
       </button>
