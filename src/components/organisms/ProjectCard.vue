@@ -125,12 +125,5 @@ export default {
         <font-awesome-icon icon="fa-solid fa-plus"/>
       </button>
     </div>
-    <Suspense>
-      <template #default>
-      </template>
-
-      <template #fallback>
-      </template>
-    </Suspense>
   </div>
 </template>

@@ -18,7 +18,8 @@ export default {
     formatCurrency,
     moment
   },
-  components: {FontAwesomeIcon}
+  components: {FontAwesomeIcon},
+  emits: ["form:submitted", "form:cancel"]
 }
 </script>
 

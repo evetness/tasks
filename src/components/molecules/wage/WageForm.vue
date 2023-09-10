@@ -21,7 +21,13 @@ export default {
         date: this.date || null,
         amount: this.amount || 0,
         currency: this.currency || ""
-      }
+      },
+      vuelidateExternalResults: {
+        form: {
+          date: [],
+        }
+      },
+      errors: new Set()
     }
   },
   computed: {
@@ -50,7 +56,13 @@ export default {
               amount: this.form.amount,
               currency: this.form.currency
             }
-          )
+          ).catch((error) => {
+            if (error.response.status === 409) {
+              Object.assign(this.vuelidateExternalResults, { form: { date: [error.response.data.message] }})
+              this.errors.add(error.response.data.message)
+            }
+            return null;
+          })
         } else {
           response = await this.axios.post(
             `/api/wages`,
@@ -60,16 +72,21 @@ export default {
               currency: this.form.currency,
               project_id: this.project
             }
-          )
+          ).catch((error) => {
+            if (error.response.status === 409) {
+              Object.assign(this.vuelidateExternalResults, { form: { date: [error.response.data.message] }})
+              this.errors.add(error.response.data.message)
+            }
+            return null;
+          })
         }
-        if (response.status !== 200) {
-          return
-        }
+        if (!response) return
         const data = await response.data
         this.$emit('form:submitted', data)
       }
     }
-  }
+  },
+  emits: ["form:submitted", "form:cancel"]
 }
 </script>
 
@@ -95,4 +112,5 @@ export default {
       </form>
     </td>
   </tr>
+  <tr v-for="error in errors" class="text-2xs text-brand/75 px-3"><td colspan="3">{{error}}</td></tr>
 </template>

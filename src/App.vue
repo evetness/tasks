@@ -8,10 +8,12 @@ import ProjectCard from "@/components/organisms/ProjectCard.vue";
 import WageCard from "@/components/organisms/WageCard.vue";
 import TaskCard from '@/components/organisms/TaskCard.vue';
 import moment from "moment/min/moment-with-locales";
+import TaskSearch from "@/components/molecules/task/TaskSearch.vue";
+import WageSearch from "@/components/molecules/wage/WageSearch.vue";
 
 export default {
   name: "App",
-  components: { FontAwesomeIcon, ProjectCard, WageCard, TaskCard },
+  components: {WageSearch, TaskSearch, FontAwesomeIcon, ProjectCard, WageCard, TaskCard },
   data() {
     return {
       page: "tasks"
@@ -35,7 +37,7 @@ export default {
 
     <div class="col-span-3 overflow-hidden">
       <div class="flex flex-col card h-full">
-        <ul class="flex flex-wrap text-sm font-medium text-center border-b border-brand/60 space-x-1 -mt-3 -mx-3 mb-3">
+        <ul class="flex flex-wrap text-sm font-medium text-center border-b border-brand/60 space-x-1 -mt-3 -ml-3 mb-3">
           <li>
             <button type="button" class="inline-block p-4 uppercase" :class="{
               'text-brand/80 bg-brand/20': this.page === 'tasks',
@@ -51,6 +53,11 @@ export default {
             }" @click="this.page = 'wages'">
               Wages
             </button>
+          </li>
+          <li class="grow"></li>
+          <li class="self-center">
+            <WageSearch v-if="this.page === 'wages'"/>
+            <TaskSearch v-if="this.page === 'tasks'"/>
           </li>
         </ul>
         <WageCard v-if="this.page === 'wages'"/>

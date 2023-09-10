@@ -47,13 +47,14 @@ export default {
       await this.getUnpaidSalary()
     },
     async formEditSubmitted(task) {
+      this.edit = 0
       const index = this.tasks.findIndex((obj => obj.id === task.id))
       this.tasks[index] = task
-      this.edit = 0
       await this.getUnpaidSalary()
     },
     async formRemoveSubmitted(id) {
-      this.tasks = this.tasks.filter((obj => obj.id !== id));
+      this.remove = 0
+      this.tasks = this.tasks.filter((obj => obj.id !== id))
       await this.getUnpaidSalary()
     },
     ...mapActions(useProjectStore, ["getUnpaidSalary"]),

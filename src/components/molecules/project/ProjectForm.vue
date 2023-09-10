@@ -20,7 +20,8 @@ export default {
         form: {
           name: []
         }
-      }
+      },
+      errors: new Set()
     }
   },
   validations() {
@@ -40,8 +41,10 @@ export default {
             { name: this.form.name }
           ).catch((error) => {
             if (error.response.status === 409) {
-              Object.assign(this.vuelidateExternalResults, { form: { name: error.response.data.message }})
+              Object.assign(this.vuelidateExternalResults, { form: { name: [error.response.data.message] }})
+              this.errors.add(error.response.data.message)
             }
+            return null;
           })
         } else {
           response = await this.axios.post(
@@ -49,15 +52,20 @@ export default {
             { name: this.form.name }
           ).catch((error) => {
             if (error.response.status === 409) {
-              Object.assign(this.vuelidateExternalResults, { form: { name: error.response.data.message }})
+              Object.assign(this.vuelidateExternalResults, { form: { name: [error.response.data.message] }})
+              this.errors.add(error.response.data.message)
             }
+            return null;
           })
         }
+        if (!response) return
+
         const data = await response.data
         this.$emit('form:submitted', data)
       }
     }
-  }
+  },
+  emits: ["form:submitted", "form:cancel"]
 }
 </script>
 
@@ -71,4 +79,5 @@ export default {
       <font-awesome-icon icon="fa-solid fa-xmark" fixedWidth />
     </button>
   </form>
+  <div v-for="error in errors" class="text-2xs text-brand/75 px-3">{{error}}</div>
 </template>

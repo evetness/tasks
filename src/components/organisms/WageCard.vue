@@ -51,13 +51,14 @@ export default {
       await this.reload()
     },
     async formEditSubmitted(wage) {
+      this.edit = 0
       const index = this.wages.findIndex((obj => obj.id === wage.id))
       this.wages[index] = wage
       this.wages.sort((a, b) => sortByDate(a, b, "date"))
-      this.edit = 0
       await this.reload()
     },
     async formRemoveSubmitted(id) {
+      this.remove = 0
       this.wages = this.wages.filter((obj => obj.id !== id));
       await this.reload()
     },
@@ -71,6 +72,7 @@ export default {
     project() {
       this.create = false;
       this.edit = 0;
+      this.remove = 0;
       this.isLoading = true;
       this.loadWages()
     },

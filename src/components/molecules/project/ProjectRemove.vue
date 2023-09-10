@@ -12,7 +12,8 @@ export default {
       this.$emit('form:submitted', this.id)
     }
   },
-  components: {FontAwesomeIcon}
+  components: {FontAwesomeIcon},
+  emits: ["form:submitted", "form:cancel"]
 }
 </script>
 

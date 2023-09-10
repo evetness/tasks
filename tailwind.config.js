@@ -9,6 +9,9 @@ export default {
     extend: {
       colors: {
         brand: 'rgb(var(--color-brand) / <alpha-value>)',
+      },
+      fontSize: {
+        '2xs': ['0.65rem', '1rem']
       }
     },
   },
