@@ -4,6 +4,7 @@ import axios from 'axios'
 import VueAxios from 'vue-axios'
 
 import App from '@/App.vue'
+// import router from '@/routers/index.js'
 import '@/style.css'
 
 import {library} from '@fortawesome/fontawesome-svg-core'
@@ -18,5 +19,6 @@ const pinia = createPinia()
 createApp(App)
     .use(pinia)
     .use(VueAxios, axios)
+    // .use(router)
     .component('font-awesome-icon', FontAwesomeIcon)
     .mount('#app')

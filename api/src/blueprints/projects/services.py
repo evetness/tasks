@@ -1,3 +1,5 @@
+import datetime
+
 from apiflask import HTTPError
 from loguru import logger
 from sqlmodel import col, select, text
@@ -5,6 +7,8 @@ from src.blueprints.projects.schemas import ProjectQuery, ProjectWrite, Unpaid
 from src.extensions import db
 from src.extensions.alchemical.models import Pagination
 from src.models import Project, Task, Wage
+
+from src.utils import timedelta_to_string
 
 
 def create_project(data: ProjectWrite) -> Project:
@@ -113,12 +117,23 @@ def calculate_unpaid_wage(ident: int) -> Unpaid | None:
 
     if not result:
         logger.warning(f"Project Tasks Not Exists: {ident}")
-        return None
+        return Unpaid(
+            amount=0,
+            elapsed="00:00",
+            currency=""
+        )
     
     task: Task = next(iter(result))
 
+    amount = round(sum(task.amount for task in result), 2)
+    elapsed = datetime.timedelta(hours=0, minutes=0)
+    for task in result:
+        hours, minutes = task.elapsed.split(":")
+        elapsed += datetime.timedelta(hours=int(hours), minutes=int(minutes))
+
     return Unpaid(
-        amount=round(sum(task.amount for task in result), 2),
+        amount=amount,
+        elapsed=timedelta_to_string(elapsed),
         currency=task.currency
     )
 

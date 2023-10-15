@@ -1,9 +1,14 @@
+import datetime
+from typing import List
+
 from loguru import logger
+from sqlalchemy import extract, or_
 from sqlmodel import col, select, text
-from src.blueprints.tasks.schemas import TaskCreate, TaskQuery, TaskUpdate
+from src.blueprints.tasks.schemas import TaskCreate, TaskQuery, TaskUpdate, TaskComplete
 from src.extensions import db
 from src.extensions.alchemical.models import Pagination
 from src.models import Task
+from src.utils import parse_date
 
 
 def create_task(data: TaskCreate) -> Task:
@@ -35,7 +40,18 @@ def read_tasks(query: TaskQuery) -> Pagination:
     if query.project_id:
         where.append(Task.project_id == query.project_id)
     if query.search:
-        where.append(col(Task.name).contains(query.search))
+        search = [col(Task.name).contains(query.search)]
+
+        dates = query.search.split("..")
+        start = parse_date(dates[0])
+        end = parse_date(dates[1]) if len(dates) > 1 else None
+
+        if start and not end:
+            search.append(Task.start >= start)
+        elif start and end:
+            search.append((Task.start >= start) & (Task.end <= end))
+
+        where.append(or_(*search))
 
     statement = select(Task) \
         .where(*where) \
@@ -78,6 +94,20 @@ def update_task(ident: int, data: TaskUpdate):
         end=data.end
     ).save()
     logger.debug(result)
+
+    return result
+
+
+def update_tasks_status(data: TaskComplete) -> List[Task]:
+    logger.debug(data)
+
+    statement = select(Task).where(Task.project_id == data.project_id, Task.end <= data.date)
+    logger.debug(statement)
+
+    result = db.session.scalars(statement)
+    logger.debug(result)
+    for task in result:
+        task.update(completed=True).save()
 
     return result
 

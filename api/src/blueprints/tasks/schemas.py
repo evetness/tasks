@@ -46,6 +46,13 @@ class TaskUpdate(TaskBase):
     ...
 
 
+@dataclass
+@add_schema
+class TaskComplete(Base):
+    project_id: int
+    date: datetime.date
+
+
 class TaskOrderBy(OrderBy):
     name = "name"
     start = "start"

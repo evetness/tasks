@@ -1,8 +1,8 @@
 from apiflask import APIBlueprint
 
-from src.blueprints.tasks.schemas import TaskPagination, TaskQuery, TaskRead, TaskCreate, TaskUpdate
-from src.blueprints.tasks.services import create_task, delete_task, read_task, read_tasks, update_task
-
+from src.blueprints.tasks.schemas import TaskPagination, TaskQuery, TaskRead, TaskCreate, TaskUpdate, TaskComplete
+from src.blueprints.tasks.services import create_task, delete_task, read_task, read_tasks, update_task, \
+    update_tasks_status
 
 bp = APIBlueprint(
     "tasks", __name__,
@@ -38,6 +38,13 @@ def get_a_task(id: int):
 @bp.output(TaskRead.Schema)
 def modify_a_task(id: int, json: TaskUpdate):
     return update_task(ident=id, data=json)
+
+
+@bp.put("/complete")
+@bp.input(TaskComplete.Schema)
+@bp.output(TaskRead.Schema(many=True))
+def complete_tasks(json: TaskComplete):
+    return update_tasks_status(data=json)
 
 
 @bp.delete("/<int:id>")

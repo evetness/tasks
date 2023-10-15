@@ -44,4 +44,5 @@ class ProjectPagination(Pagination):
 @add_schema
 class Unpaid(Base):
     amount: float
+    elapsed: str
     currency: str

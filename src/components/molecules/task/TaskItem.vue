@@ -1,16 +1,15 @@
 <script>
 import moment from 'moment/min/moment-with-locales'
-import { mapState } from 'pinia'
-import { useProjectStore } from '@/stores/project'
 
 import { formatCurrency } from '@/utils'
+import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
 
 export default {
   name: "TaskItem",
+  components: {FontAwesomeIcon},
   props: ["task", "disabled"],
   computed: {
-    elapsed() { return moment.duration(this.task.elapsed).humanize() },
-    ...mapState(useProjectStore, { project: "id" })
+    elapsed() { return moment.duration(this.task.elapsed).humanize() }
   },
   methods: {
     formatCurrency,
@@ -21,34 +20,36 @@ export default {
 </script>
 
 <template>
-  <tr class="group hover:bg-brand/20">
-    <td class="text-xs text-left pl-2">
-      <div class="flex items-center gap-1">
+  <div class="group hover:bg-brand/20 pl-1">
+    <div class="grid grid-cols-12 items-center gap-1 text-xs">
+      <div class="col-span-4 flex items-center gap-1">
         <font-awesome-icon v-if="task.completed" icon="fa-regular fa-check-circle" size="xs" />
         <font-awesome-icon v-else icon="fa-regular fa-hourglass-half" size="xs" />
         {{ task.name }}
       </div>
-    </td>
-    <td class="text-xs text-right">{{ this.moment(task.start).format("lll") }}</td>
-    <td class="text-xs text-right">{{ this.moment(task.end).format("lll") }}</td>
-    <td class="text-xs text-right text-brand">{{ elapsed }}</td>
-    <td class="text-xs text-right text-brand tracking-thighter font-extrabold" :class="{
-      'group-hover:scale-125 pr-1 transition-all': task.amount
-    }">
-      {{ formatCurrency(task.amount, task.currency) }}
-    </td>
-    <td>
-      <div class="flex items-center justify-end">
+
+      <div class="col-span-4 text-right">
+        <div>{{ this.moment(task.start).format("lll") }} - {{ this.moment(task.end).format("lll") }}</div>
+        <div class="font-bold">{{ elapsed }}</div>
+      </div>
+
+      <div class="col-span-2 text-right tracking-thighter" :class="{
+        'group-hover:font-extrabold group-hover:text-sm transition-all': task.amount
+      }">
+        {{ formatCurrency(task.amount, task.currency) }}
+      </div>
+
+      <div class="col-span-2 flex items-center justify-end">
         <button type="button" class="btn btn-text" :disabled="disabled"
                 @click="$emit('task:edit', this.task.id)">
           <font-awesome-icon icon="fa-regular fa-pen-to-square" fixedWidth />
         </button>
-  
+
         <button type="button" class="btn btn-text" :disabled="disabled"
                 @click="$emit('task:remove', this.task.id)">
           <font-awesome-icon icon="fa-regular fa-trash-can" fixedWidth />
         </button>
       </div>
-    </td>
-  </tr>
+    </div>
+  </div>
 </template>

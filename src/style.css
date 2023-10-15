@@ -3,8 +3,8 @@
 @tailwind utilities;
 
 :root {
-  --color-brand: 245 158 11;
-  /* --color-brand: 50 141 168; */
+  /*--color-brand: 245 158 11;*/
+   --color-brand: 50 141 168;
 }
 
 body {

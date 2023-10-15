@@ -1,6 +1,8 @@
 <script>
 import axios from "axios";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import {mapActions} from "pinia";
+import {useProjectStore} from "@/stores/project.js";
 
 export default {
   name: "ProjectRemove",
@@ -9,11 +11,13 @@ export default {
     async submitForm() {
       const response = await axios.delete(`/api/projects/${this.id}`)
       if (response.status !== 204) return;
-      this.$emit('form:submitted', this.id)
-    }
+      this.removeProject(this.id)
+      this.$emit('form:close')
+    },
+    ...mapActions(useProjectStore, ["removeProject"]),
   },
   components: {FontAwesomeIcon},
-  emits: ["form:submitted", "form:cancel"]
+  emits: ["form:close"]
 }
 </script>
 
@@ -29,7 +33,7 @@ export default {
     <button type="submit" class="btn hover:bg-brand/30">
       <font-awesome-icon icon="fa-regular fa-trash-can" fixedWidth />
     </button>
-    <button type="button" class="btn hover:bg-brand/30" @click="$emit('form:cancel')">
+    <button type="button" class="btn hover:bg-brand/30" @click="$emit('form:close')">
       <font-awesome-icon icon="fa-solid fa-xmark" fixedWidth />
     </button>
   </form>

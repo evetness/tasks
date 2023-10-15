@@ -3,6 +3,8 @@ import useVuelidate from '@vuelidate/core';
 import { required } from "@vuelidate/validators";
 import Input from '@/components/atoms/Input.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import {mapActions} from "pinia";
+import {useProjectStore} from "@/stores/project.js";
 
 export default {
   name: "ProjectCreate",
@@ -60,12 +62,14 @@ export default {
         }
         if (!response) return
 
-        const data = await response.data
-        this.$emit('form:submitted', data)
+        const project = await response.data
+        this.updateProjects(project)
+        this.$emit('form:close')
       }
-    }
+    },
+    ...mapActions(useProjectStore, ["updateProjects"]),
   },
-  emits: ["form:submitted", "form:cancel"]
+  emits: ["form:close"]
 }
 </script>
 
@@ -75,7 +79,7 @@ export default {
     <button type="submit" class="btn btn-text" :disabled="v$.$invalid" title="Submit">
       <font-awesome-icon icon="fa-regular fa-floppy-disk" fixedWidth />
     </button>
-    <button type="button" class="btn btn-text" @click="$emit('form:cancel')" title="Cancel">
+    <button type="button" class="btn btn-text" @click="$emit('form:close')" title="Cancel">
       <font-awesome-icon icon="fa-solid fa-xmark" fixedWidth />
     </button>
   </form>

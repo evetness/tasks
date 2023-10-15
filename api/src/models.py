@@ -5,6 +5,8 @@ from sqlmodel import Field, Relationship
 from src.constants import HOUR
 from src.extensions.alchemical.models import Base
 
+from src.utils import timedelta_to_string
+
 
 class Wage(Base, table=True):
     date: datetime.date = Field(default_factory=datetime.date.today)
@@ -42,7 +44,7 @@ class Task(Base, table=True):
             primaryjoin="(foreign(Wage.date) <= Task.start) & (foreign(Wage.project_id) == Task.project_id)",
             lazy="joined",
             uselist=False,
-            backref="tasks"
+            viewonly=True
         )
     )
 
@@ -51,9 +53,7 @@ class Task(Base, table=True):
         if not self.end:
             return "00:00"
         result = self.end - self.start
-        hours = (result.days * 24) + result.seconds // 3600
-        minutes = (result.seconds // 60) % 60
-        return f"{hours}:{minutes}"
+        return timedelta_to_string(result)
     
     @property
     def amount(self) -> float:

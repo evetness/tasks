@@ -50,6 +50,7 @@ export default {
 
     <div class="col-span-3 overflow-hidden">
       <div id="project-details" class="flex flex-col card h-full">
+        
         <ul class="flex flex-wrap text-sm font-medium text-center border-b border-brand/60 space-x-1 -mt-3 -ml-3 mb-3">
           <li>
             <button type="button" class="inline-block p-4 uppercase" :class="{
@@ -72,8 +73,8 @@ export default {
             <Input label="Search" name="search" type="search" v-model="search" :disabled="!selected"/>
           </li>
         </ul>
-        <TaskCard v-if="page === 'tasks'"/>
-        <WageCard v-if="page === 'wages'"/>
+
+        <router-view></router-view>
       </div>
     </div>
   </div>

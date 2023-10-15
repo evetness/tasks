@@ -10,12 +10,5 @@ export default {
 </script>
 
 <template>
-  <tr v-for="n in size" class="group animate-pulse bg-brand/20 h-9">
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-    <td></td>
-  </tr>
+  <div v-for="n in size" class="w-full animate-pulse bg-brand/20 h-9"></div>
 </template>
