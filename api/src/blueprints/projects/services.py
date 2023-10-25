@@ -3,7 +3,7 @@ import datetime
 from apiflask import HTTPError
 from loguru import logger
 from sqlmodel import col, select, text
-from src.blueprints.projects.schemas import ProjectQuery, ProjectWrite, Unpaid
+from src.blueprints.projects.schemas import ProjectQuery, ProjectWrite, Salary, WageWrite
 from src.extensions import db
 from src.extensions.alchemical.models import Pagination
 from src.models import Project, Task, Wage
@@ -46,23 +46,23 @@ def read_projects(query: ProjectQuery) -> Pagination:
     return result
 
 
-def read_project(ident: int) -> Project:
-    logger.debug(ident)
+def read_project(project_id: int) -> Project:
+    logger.debug(project_id)
 
-    result = db.session.get(Project, ident)
+    result = db.session.get(Project, project_id)
     if not result:
-        logger.warning(f"Project Not Exists: {ident}")
+        logger.warning(f"Project Not Exists: {project_id}")
         raise HTTPError(status_code=404, message="Project Not Exists")
     logger.debug(result)
 
     return result
 
 
-def update_project(ident: int, data: ProjectWrite) -> Project:
-    logger.debug(ident)
+def update_project(project_id: int, data: ProjectWrite) -> Project:
+    logger.debug(project_id)
     logger.debug(data)
 
-    statement = select(Project).where(Project.id != ident, Project.name == data.name)
+    statement = select(Project).where(Project.id != project_id, Project.name == data.name)
     logger.debug(statement)
 
     _project = db.session.scalar(statement)
@@ -70,54 +70,88 @@ def update_project(ident: int, data: ProjectWrite) -> Project:
         logger.warning(f"Project Already Exists: {_project.id} - {_project.name}")
         raise HTTPError(status_code=409, message="Project Already Exists")
     
-    result = read_project(ident)
+    result = read_project(project_id)
     result.update(name=data.name).save()
     logger.debug(result)
 
     return result
 
 
-def delete_project(ident: int) -> None:
-    logger.debug(ident)
+def delete_project(project_id: int) -> None:
+    logger.debug(project_id)
 
-    result = read_project(ident)
+    result = read_project(project_id)
     result.delete()
 
 
-def project_current_salary(ident: int) -> Wage | None:
-    logger.debug(ident)
-
-    project = read_project(ident)
+def read_current_wage(project_id: int) -> Wage | None:
+    logger.debug(project_id)
 
     statement = select(Wage) \
-        .where(Wage.project_id == project.id) \
+        .where(Wage.project_id == project_id) \
         .order_by(Wage.date.desc())
     logger.debug(statement)
 
     result = db.session.scalar(statement)
     if not result:
-        logger.warning(f"Project Wage Not Exists: {ident}")
+        logger.warning(f"Wage Not Exists: {project_id}")
         return None
     logger.debug(result)
 
     return result
 
 
-def calculate_unpaid_wage(ident: int) -> Unpaid | None:
-    logger.debug(ident)
+def save_wage(project_id: int, data: WageWrite) -> Wage:
+    logger.debug(project_id)
+    logger.debug(data)
 
-    project = read_project(ident)
+    statement = select(Wage).where(Wage.date == data.date, Wage.project_id == project_id)
+    logger.debug(statement)
+
+    result = db.session.scalar(statement)
+    if result:
+        result.update(amount=data.amount, currency=data.currency)
+    else:
+        result = Wage(date=data.date, amount=data.amount, currency=data.currency, project_id=project_id)
+
+    result.save()
+    logger.debug(result)
+    
+    return result
+   
+
+def delete_wage(project_id: int) -> Wage | None:
+    logger.debug(project_id)
+
+    statement = select(Wage) \
+        .where(Wage.project_id == project_id) \
+        .order_by(Wage.date.desc())
+    logger.debug(statement)
+
+    result = db.session.scalar(statement)
+    if not result:
+        logger.warning(f"Wage Not Exists: {project_id}")
+        raise HTTPError(status_code=409, message="Wage Not Exists")
+
+    logger.debug(result)
+    result.delete()
+
+    return result
+
+
+def read_salary(project_id: int) -> Salary | None:
+    logger.debug(project_id)
 
     statement = select(Task) \
-        .where(Task.project_id == project.id, Task.completed == 0)
+        .where(Task.project_id == project_id, Task.completed == 0)
     logger.debug(statement)
 
     result = db.session.scalars(statement).unique().all()
     logger.debug(result)
 
     if not result:
-        logger.warning(f"Project Tasks Not Exists: {ident}")
-        return Unpaid(
+        logger.warning(f"Tasks Not Exists: {project_id}")
+        return Salary(
             amount=0,
             elapsed="00:00",
             currency=""
@@ -131,7 +165,7 @@ def calculate_unpaid_wage(ident: int) -> Unpaid | None:
         hours, minutes = task.elapsed.split(":")
         elapsed += datetime.timedelta(hours=int(hours), minutes=int(minutes))
 
-    return Unpaid(
+    return Salary(
         amount=amount,
         elapsed=timedelta_to_string(elapsed),
         currency=task.currency

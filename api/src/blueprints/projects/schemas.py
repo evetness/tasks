@@ -1,3 +1,5 @@
+import datetime
+
 from dataclasses import dataclass, field
 from typing import List
 
@@ -40,9 +42,30 @@ class ProjectPagination(Pagination):
     items: List[ProjectRead]
 
 
+
 @dataclass
 @add_schema
-class Unpaid(Base):
+class WageBase(Base):
+    date: datetime.date
+    amount: int
+    currency: str
+
+
+@dataclass
+@add_schema
+class WageRead(WageBase):
+    id: int
+
+
+@dataclass
+@add_schema
+class WageWrite(WageBase):
+    ...
+
+
+@dataclass
+@add_schema
+class Salary(Base):
     amount: float
     elapsed: str
     currency: str

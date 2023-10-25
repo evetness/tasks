@@ -13,7 +13,7 @@ import ProjectRemove from '@/components/molecules/project/ProjectRemove.vue';
 export default {
   name: "ProjectCard",
   components: {FontAwesomeIcon, ProjectItem, ProjectForm, ProjectRemove, ProjectSkeleton},
-    data() {
+  data() {
     return {
       create: false,
       edit: 0,
@@ -48,7 +48,8 @@ export default {
 <template>
   <div class="h-full flex flex-col gap-3 card">
     <div class="flex items-center justify-between">
-      <h1 class="font-medium text-lg md:text-xl leading-none text-brand/80 uppercase">
+      <h1 class="font-extrabold text-lg md:text-xl leading-none text-brand/80 uppercase">
+        <font-awesome-icon icon="rocket" />
         Projects
       </h1>
     </div>

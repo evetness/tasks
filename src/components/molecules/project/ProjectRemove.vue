@@ -1,8 +1,8 @@
 <script>
 import axios from "axios";
-import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
-import {mapActions} from "pinia";
-import {useProjectStore} from "@/stores/project.js";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import { mapActions } from "pinia";
+import { useProjectStore } from "@/stores/project.js";
 
 export default {
   name: "ProjectRemove",
@@ -16,25 +16,41 @@ export default {
     },
     ...mapActions(useProjectStore, ["removeProject"]),
   },
-  components: {FontAwesomeIcon},
+  components: { FontAwesomeIcon },
   emits: ["form:close"]
 }
 </script>
 
 <template>
-  <form @submit.prevent="submitForm" 
-    class="flex items-center text-brand/80 text-sm hover:bg-brand/20 focus:bg-brand/20 border-x border-dashed border-brand/80">
-    <div class="flex items-center mr-auto">
-      <font-awesome-icon icon="triangle-exclamation" class="w-4 h-4 px-2" shake fixedWidth style="--fa-animation-duration: 2s;" />
-      <div class="text-xs">
-        Remove <span class="font-bold">{{ name }}</span>?
+  <div class="group relative w-64 sm:w-72">
+    <div class="text-brand text-sm text-center">
+      <div class="h-6 w-5/12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/20">
+        <font-awesome-icon icon="trash-can" />
       </div>
     </div>
-    <button type="submit" class="btn hover:bg-brand/30">
-      <font-awesome-icon icon="fa-regular fa-trash-can" fixedWidth />
-    </button>
-    <button type="button" class="btn hover:bg-brand/30" @click="$emit('form:close')">
-      <font-awesome-icon icon="fa-solid fa-xmark" fixedWidth />
-    </button>
-  </form>
+    <div class="flex items-center flex-wrap rounded-b-2xl rounded-tr-2xl border-2 border-transparent bg-brand/20">
+      <div class="flex-auto p-4 text-brand">
+        <form @submit.prevent="submitForm">
+          <div class="h-12 overflow-ellipsis mt-1">
+            <div class="flex leading-none">
+              <font-awesome-icon icon="triangle-exclamation" size="lg" fixedWidth />
+              <div class="ml-1 text-sm">
+                Remove <span class="font-bold">{{ name }}</span>?
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 justify-end mt-1">
+            <button type="submit" class="btn btn-text text-xs uppercase">
+              <font-awesome-icon icon="fa-trash-can" fixedWidth />
+              Remove
+            </button>
+            <button type="button" class="btn btn-text text-xs uppercase" @click="$emit('form:close')">
+              <font-awesome-icon icon="fa-solid fa-xmark" fixedWidth />
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 </template>

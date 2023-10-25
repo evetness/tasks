@@ -1,26 +1,19 @@
 <script>
 export default {
-  name: 'ProjectSkeleton',
-  computed: {
-    size() {
-      return Math.floor(Math.random() * 10) + 1
-    }
-  }
+  name: "ProjectSkeleton"
 }
 </script>
 
 <template>
-  <div class="space-y-1 overflow-y-scroll">
-    <div v-for="n in size" class="group animate-pulse">
-      <div class="flex items-center gap-0.5 border-x border-transparent">
-        <div class="w-full py-2 px-3 text-left bg-brand/20 h-9"></div>
-        <div class="btn bg-brand/10 h-9 w-16"></div>
-        <div class="btn bg-brand/10 h-9 w-16"></div>
-      </div>
+  <div class="group relative animate-pulse">
+    <div class="flex gap-0.5">
+      <div class="h-6 w-5/12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/10"></div>
+      <div class="h-6 w-2/12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/5"></div>
+      <div class="h-6 w-2/12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/5"></div>
     </div>
-    <div class="animate-pulse">
-      <div class="flex items-center gap-0.5 border-x border-transparent">
-        <div class="btn bg-brand/10 h-9 w-full"></div>
+    <div class="flex items-center flex-wrap rounded-b-2xl rounded-tr-2xl border-2 border-transparent bg-brand/10">
+      <div class="flex-auto p-4">
+        <div class="flex items-center justify-center gap-1 py-5 sm:py-8 sm:text-2xl break-all">&nbsp;</div>
       </div>
     </div>
   </div>
