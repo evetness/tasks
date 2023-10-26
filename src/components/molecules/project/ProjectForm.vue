@@ -3,25 +3,23 @@ import useVuelidate from '@vuelidate/core';
 import { required } from "@vuelidate/validators";
 import Input from '@/components/atoms/Input.vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { mapActions } from "pinia";
+import { mapActions, mapState } from "pinia";
 import { useProjectStore } from "@/stores/project.js";
 
 export default {
-  name: "ProjectCreate",
-  props: ["isOpen", "id", "name"],
+  name: "ProjectForm",
+  props: ["isEdit"],
   components: { FontAwesomeIcon, Input },
   setup() {
     return { v$: useVuelidate() }
   },
   computed: {
-    isEdit() {
-      return this.id ? true : false;
-    }
+    ...mapState(useProjectStore, ["selected", "project"])
   },
   data() {
     return {
       form: {
-        name: this.name || ""
+        name: this.isEdit ? this.project : ""
       },
       vuelidateExternalResults: {
         form: {
@@ -42,9 +40,9 @@ export default {
     async submitForm() {
       if (this.v$.$invalid === false) {
         let response = null
-        if (this.id) {
+        if (this.isEdit) {
           response = await this.axios.put(
-            `/api/projects/${this.id}`,
+            `/api/projects/${this.selected}`,
             { name: this.form.name }
           ).catch((error) => {
             if (error.response.status === 409) {
@@ -74,6 +72,9 @@ export default {
     },
     ...mapActions(useProjectStore, ["updateProjects"]),
   },
+  mounted() {
+    console.log(this.project)
+  },
   emits: ["form:close"]
 }
 </script>
@@ -89,18 +90,23 @@ export default {
     <div class="flex items-center flex-wrap rounded-b-2xl rounded-tr-2xl border-2 border-transparent bg-brand/20">
       <div class="flex-auto p-4 text-brand">
         <form @submit.prevent="submitForm">
-          <Input label="Name" name="name" type="text" v-model="form.name" :autofocus="true"
-            :errors="v$.form.name.$errors" />
+          <div class="text-sm">
+            <Input name="name" type="text" v-model="form.name" :autofocus="true" :errors="v$.form.name.$errors">
+            <template #prefix>
+              <font-awesome-icon icon="clipboard" class="ml-2" />
+            </template>
+            </Input>
+          </div>
           <div class="text-2xs text-brand/70 text-left">
             {{ errors.size !== 0 ? Array.from(errors).join(', ') : '&nbsp;' }}
           </div>
-          <div class="flex items-center gap-1 justify-end mt-1">
+          <div class="flex items-center gap-1 justify-end mt-2">
             <button type="submit" class="btn btn-text text-xs uppercase" :disabled="v$.$invalid">
               <font-awesome-icon icon="fa-regular fa-floppy-disk" fixedWidth />
               {{ isEdit ? 'Edit' : 'Add' }}
             </button>
             <button type="button" class="btn btn-text text-xs uppercase" @click="$emit('form:close')">
-              <font-awesome-icon icon="fa-solid fa-xmark" fixedWidth />
+              <font-awesome-icon icon="xmark" fixedWidth />
               Cancel
             </button>
           </div>

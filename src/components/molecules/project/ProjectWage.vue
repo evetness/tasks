@@ -1,27 +1,29 @@
 <script>
 import useVuelidate from '@vuelidate/core';
-import { required } from "@vuelidate/validators";
+import { required, decimal } from "@vuelidate/validators";
 
 import { mapActions, mapState } from "pinia";
 import { useProjectStore } from "@/stores/project.js";
+import { useTaskStore } from "@/stores/task.js";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import Input from "@/components/atoms/Input.vue";
-import { useTaskStore } from "@/stores/task.js";
 
 export default {
   name: "ProjectWage",
-  props: ["id"],
   components: { FontAwesomeIcon, Input },
+  computed: {
+    ...mapState(useProjectStore, ["selected", "wage"])
+  },
   setup() {
     return { v$: useVuelidate() }
   },
   data() {
     return {
       form: {
-        date: this.date || null,
-        amount: this.amount || 0,
-        currency: this.currency || ""
+        date: this.wage ? this.wage.date : null,
+        amount: this.wage ? this.wage.amount : 0,
+        currency: this.wage ? this.wage.currency : ""
       },
       vuelidateExternalResults: {
         form: {
@@ -44,19 +46,18 @@ export default {
     async submitForm() {
       if (this.v$.$invalid === false) {
         let response = await this.axios.put(
-          `/api/project/${this.id}/wage`,
+          `/api/projects/${this.selected}/wage`,
           {
             date: this.form.date,
             amount: this.form.amount,
-            currency: this.form.currency,
-            project_id: this.id
+            currency: this.form.currency
           }
         )
         if (!response) return
 
-        // await this.getCurrentWage();
-        // await this.getUnpaidSalary();
-        // await this.getTasks();
+        this.getCurrentWage();
+        this.getUnpaidSalary();
+        this.getTasks();
         this.$emit('form:close')
       }
     },
@@ -71,25 +72,38 @@ export default {
   <div class="group relative w-64 sm:w-72">
     <div class="text-brand text-sm text-center">
       <div class="h-6 w-5/12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/20">
-        <font-awesome-icon icon="dollar" />
+        <font-awesome-icon icon="file-invoice-dollar" />
       </div>
     </div>
     <div class="flex items-center flex-wrap rounded-b-2xl rounded-tr-2xl border-2 border-transparent bg-brand/20">
       <div class="flex-auto p-4 text-brand">
         <form @submit.prevent="submitForm">
-          <Input label="Since" name="date" type="date" v-model="form.date" :autofocus="true"
-            :errors="v$.form.date.$errors" />
-          <Input label="Amount" name="amount" type="number" v-model="form.amount" min="0" class="text-right"
-            :errors="v$.form.amount.$errors" />
-          <Input label="Currency" name="currency" type="text" v-model="form.currency" maxlength="3"
-            :errors="v$.form.currency.$errors" />
+          <div class="space-y-1 text-xs">
+            <Input name="date" type="date" v-model="form.date" :autofocus="true" :errors="v$.form.date.$errors">
+            <template #prefix>
+              <font-awesome-icon icon="calendar" class="ml-2" />
+            </template>
+            </Input>
+            <div class="flex items-center gap-1">
+              <Input name="amount" type="number" v-model="form.amount" min="0" :errors="v$.form.amount.$errors">
+              <template #prefix>
+                <font-awesome-icon icon="wallet" class="ml-2" />
+              </template>
+              </Input>
+              <Input name="currency" type="text" v-model="form.currency" maxlength="3" :errors="v$.form.currency.$errors">
+              <template #prefix>
+                <font-awesome-icon icon="dollar" class="ml-2" />
+              </template>
+              </Input>
+            </div>
+          </div>
           <div class="text-2xs text-brand/70 text-left">
             {{ errors.size !== 0 ? Array.from(errors).join(', ') : '&nbsp;' }}
           </div>
-          <div class="flex items-center gap-1 justify-end mt-1">
+          <div class="flex items-center gap-1 justify-end">
             <button type="submit" class="btn btn-text text-xs uppercase" :disabled="v$.$invalid">
-              <font-awesome-icon icon="dollar" fixedWidth />
-              Pay
+              <font-awesome-icon icon="fa-regular fa-floppy-disk" fixedWidth />
+              Save
             </button>
             <button type="button" class="btn btn-text text-xs uppercase" @click="$emit('form:close')">
               <font-awesome-icon icon="xmark" fixedWidth />

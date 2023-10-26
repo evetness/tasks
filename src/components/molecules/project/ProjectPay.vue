@@ -11,16 +11,17 @@ import { useTaskStore } from "@/stores/task.js";
 
 export default {
   name: "ProjectPay",
-  props: ["id"],
   components: { FontAwesomeIcon, Input },
   setup() {
     return { v$: useVuelidate() }
   },
+  computed: {
+    ...mapState(useProjectStore, ["selected", "project"])
+  },
   data() {
     return {
       form: {
-        date: null,
-        project_id: this.id
+        date: null
       },
       vuelidateExternalResults: {
         form: {
@@ -44,14 +45,14 @@ export default {
           `/api/tasks/complete`,
           {
             date: this.form.date,
-            project_id: this.id
+            project_id: this.selected,
           }
         )
         if (!response) return
 
-        await this.getCurrentWage();
-        await this.getUnpaidSalary();
-        await this.getTasks();
+        this.getCurrentWage();
+        this.getUnpaidSalary();
+        this.getTasks();
         this.$emit('form:close')
       }
     },
@@ -72,12 +73,17 @@ export default {
     <div class="flex items-center flex-wrap rounded-b-2xl rounded-tr-2xl border-2 border-transparent bg-brand/20">
       <div class="flex-auto p-4 text-brand">
         <form @submit.prevent="submitForm">
-          <Input label="Date" name="date" type="date" v-model="form.date" :autofocus="true"
-            :errors="v$.form.date.$errors" />
+          <div class="text-sm">
+            <Input type="date" v-model="form.date" :autofocus="true" :errors="v$.form.date.$errors">
+            <template #prefix>
+              <font-awesome-icon icon="calendar" class="ml-2" />
+            </template>
+            </Input>
+          </div>
           <div class="text-2xs text-brand/70 text-left">
             {{ errors.size !== 0 ? Array.from(errors).join(', ') : '&nbsp;' }}
           </div>
-          <div class="flex items-center gap-1 justify-end mt-1">
+          <div class="flex items-center gap-1 justify-end mt-1.5">
             <button type="submit" class="btn btn-text text-xs uppercase" :disabled="v$.$invalid">
               <font-awesome-icon icon="dollar" fixedWidth />
               Pay

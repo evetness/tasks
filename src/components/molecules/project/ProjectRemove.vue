@@ -1,22 +1,24 @@
 <script>
 import axios from "axios";
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-import { mapActions } from "pinia";
+import { mapActions, mapState } from "pinia";
 import { useProjectStore } from "@/stores/project.js";
 
 export default {
   name: "ProjectRemove",
-  props: ["id", "name"],
+  components: { FontAwesomeIcon },
+  computed: {
+    ...mapState(useProjectStore, ["selected", "project"])
+  },
   methods: {
     async submitForm() {
-      const response = await axios.delete(`/api/projects/${this.id}`)
+      const response = await axios.delete(`/api/projects/${this.selected}`)
       if (response.status !== 204) return;
-      this.removeProject(this.id)
+      this.removeProject(this.selected)
       this.$emit('form:close')
     },
     ...mapActions(useProjectStore, ["removeProject"]),
   },
-  components: { FontAwesomeIcon },
   emits: ["form:close"]
 }
 </script>
@@ -35,7 +37,7 @@ export default {
             <div class="flex leading-none">
               <font-awesome-icon icon="triangle-exclamation" size="lg" fixedWidth />
               <div class="ml-1 text-sm">
-                Remove <span class="font-bold">{{ name }}</span>?
+                Remove <span class="font-bold">{{ project }}</span>?
               </div>
             </div>
           </div>

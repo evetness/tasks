@@ -13,7 +13,7 @@ body {
 
 /* width */
 ::-webkit-scrollbar {
-  @apply w-1 h-1.5;
+  @apply h-1.5 w-1;
 }
 
 /* Track */
@@ -23,12 +23,20 @@ body {
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  @apply bg-brand/60 hover:bg-brand/90 cursor-vertical-text rounded-full;
+  @apply cursor-vertical-text rounded-full bg-brand/60 hover:bg-brand/90;
 }
 
 @layer base {
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
   input {
-    @apply tracking-normal border-none focus:ring-0 !important;
+    @apply border-none tracking-normal focus:ring-0 !important;
   }
   :focus,
   :focus-visible,
@@ -46,7 +54,7 @@ body {
 
 @layer components {
   .card {
-    @apply bg-stone-800 rounded-2xl p-3 md:p-4;
+    @apply rounded-2xl bg-stone-800 p-3 md:p-4;
   }
   .drop-brand-shadow {
     filter: drop-shadow(0 0 0.5rem rgb(var(--color-brand)));
@@ -55,10 +63,10 @@ body {
     filter: drop-shadow(0 0 1rem rgb(var(--color-brand)));
   }
   .btn {
-    @apply inline-flex items-center gap-1 text-sm px-4 py-2.5 font-medium rounded-lg leading-none;
+    @apply inline-flex items-center gap-1 rounded-lg px-4 py-2.5 text-sm font-medium leading-none;
   }
   .btn-brand {
-    @apply text-brand bg-brand/40 hover:bg-brand/50 focus:bg-brand/50;
+    @apply bg-brand/40 text-brand hover:bg-brand/50 focus:bg-brand/50;
   }
   .btn-text {
     @apply text-brand hover:bg-brand/20 focus:bg-brand/20;
@@ -71,9 +79,9 @@ body {
     @apply cursor-not-allowed;
   }
   .btn-brand[disabled] {
-    @apply text-brand/40 bg-brand/10 border-brand/20;
+    @apply border-brand/20 bg-brand/10 text-brand/40;
   }
   .btn-text[disabled] {
-    @apply text-brand/40 bg-transparent;
+    @apply bg-transparent text-brand/40;
   }
 }
