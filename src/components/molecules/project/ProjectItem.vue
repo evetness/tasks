@@ -1,62 +1,58 @@
-<script>
-import { FontAwesomeIcon, FontAwesomeLayers } from "@fortawesome/vue-fontawesome";
-import { mapState, mapActions } from "pinia";
+<script setup>
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+
+import { computed, defineProps, defineEmits } from 'vue';
+
+import { storeToRefs } from 'pinia';
 import { useGlobalStore } from "@/stores/global.js";
 import { useProjectStore } from "@/stores/project.js";
 
-import ProjectUnpaidComplete from "@/components/molecules/project/ProjectPay.vue";
+const globalStore = useGlobalStore();
+const projectStore = useProjectStore();
 
-export default {
-  name: "ProjectItem",
-  components: { ProjectUnpaidComplete, FontAwesomeIcon, FontAwesomeLayers },
-  props: ["project"],
-  computed: {
-    isSelected() { return this.selected === this.project.id },
-    canPaySalary() { return this.isSelected && !this.isSalaryLoading && this.unpaid !== '-' },
-    ...mapState(useProjectStore, ["selected", "unpaid", "elapsed", "amount"]),
-    ...mapState(useGlobalStore, ["inAction", "isSalaryLoading"])
-  },
-  methods: {
-    ...mapActions(useProjectStore, ["selectProject"]),
-    ...mapActions(useGlobalStore, ["setAction"])
-  },
-  emits: ["project:edit", "project:remove", "project:salary", "project:pay"]
-}
+const emits = defineEmits(['project:edit', 'project:remove', 'project:salary', 'project:pay']);
+const props = defineProps(['project']);
+const { inAction, isSalaryLoading } = storeToRefs(globalStore);
+const { selected, unpaid, elapsed, amount } = storeToRefs(projectStore);
+const { selectProject } = projectStore;
+
+const isSelected = computed(() => props.project.id === selected.value);
+const canPaySalary = computed(() => isSelected.value && !isSalaryLoading.value && unpaid.value !== '-');
 </script>
 
 <template>
   <div class="group relative w-56 sm:w-72">
     <div class="flex gap-0.5 text-brand text-sm text-center">
 
-      <button v-if="!isSelected" type="button" @click="selectProject(project.id, project.name)" :disabled="inAction"
+      <button v-if="!isSelected" type="button" @click="selectProject(project.id)" :disabled="inAction"
         class="h-6 w-5/12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/10" :class="{
           'group-hover:bg-brand/30 group-focus-within:bg-brand/30': !inAction
         }">
         <font-awesome-icon icon="clipboard" />
       </button>
 
-      <button v-if="isSelected" type="button" @click="$emit('project:edit', project.id)" :disabled="inAction"
+      <button v-if="isSelected" type="button" @click="emits('project:edit', project.id)" :disabled="inAction"
         class="h-6 w-2/12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/50" :class="{
           'hover:bg-brand/60 focus:bg-brand/60': !inAction
         }">
         <font-awesome-icon icon="pen-to-square" />
       </button>
 
-      <button v-if="isSelected" type="button" @click="$emit('project:remove', project.id)" :disabled="inAction"
+      <button v-if="isSelected" type="button" @click="emits('project:remove', project.id)" :disabled="inAction"
         class="h-6 w-2/12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/50" :class="{
           'hover:bg-brand/60 focus:bg-brand/60': !inAction
         }">
         <font-awesome-icon icon="trash-can" />
       </button>
 
-      <button v-if="isSelected" type="button" @click="$emit('project:salary', project.id)" :disabled="inAction"
+      <button v-if="isSelected" type="button" @click="emits('project:salary', project.id)" :disabled="inAction"
         class="h-6 w-2/12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/50" :class="{
           'hover:bg-brand/60 focus:bg-brand/60': !inAction
         }">
         <font-awesome-icon icon="file-invoice-dollar" />
       </button>
 
-      <button v-if="canPaySalary" type="button" @click="$emit('project:pay', project.id)" :disabled="inAction"
+      <button v-if="canPaySalary" type="button" @click="emits('project:pay', project.id)" :disabled="inAction"
         class="h-6 w-2/12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/50" :class="{
           'hover:bg-brand/60 focus:bg-brand/60': !inAction
         }">
@@ -70,8 +66,7 @@ export default {
       'bg-brand/10 group-hover:bg-brand/20 group-focus-within:bg-brand/20': !isSelected && !inAction,
       'bg-brand/40': isSelected
     }">
-      <button type="button" @click="selectProject(project.id, project.name)" :disabled="isSelected || inAction"
-        class="flex-auto p-4">
+      <button type="button" @click="selectProject(project.id)" :disabled="isSelected || inAction" class="flex-auto p-4">
 
         <div class="flex items-center justify-between gap-1 sm:text-xl break-all text-brand" :class="{
           'pb-14 sm:pb-16': !isSelected,

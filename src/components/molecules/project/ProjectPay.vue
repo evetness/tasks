@@ -1,65 +1,48 @@
-<script>
+<script setup>
+import { ref, computed, defineEmits, inject } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required } from "@vuelidate/validators";
 
-import { mapActions, mapState } from "pinia";
+import { storeToRefs } from 'pinia';
 import { useProjectStore } from "@/stores/project.js";
+import { useTaskStore } from "@/stores/task.js";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import Input from "@/components/atoms/Input.vue";
-import { useTaskStore } from "@/stores/task.js";
 
-export default {
-  name: "ProjectPay",
-  components: { FontAwesomeIcon, Input },
-  setup() {
-    return { v$: useVuelidate() }
-  },
-  computed: {
-    ...mapState(useProjectStore, ["selected", "project"])
-  },
-  data() {
-    return {
-      form: {
-        date: null
-      },
-      vuelidateExternalResults: {
-        form: {
-          date: [],
-        }
-      },
-      errors: new Set()
-    }
-  },
-  validations() {
-    return {
-      form: {
-        date: { required, $autoDirty: true },
-      }
-    }
-  },
-  methods: {
-    async submitForm() {
-      if (this.v$.$invalid === false) {
-        let response = await this.axios.put(
-          `/api/tasks/complete`,
-          {
-            date: this.form.date,
-            project_id: this.selected,
-          }
-        )
-        if (!response) return
+const emits = defineEmits(['form:close']);
+const axios = inject('axios');
 
-        this.getCurrentWage();
-        this.getUnpaidSalary();
-        this.getTasks();
-        this.$emit('form:close')
+const projectStore = useProjectStore();
+const { project } = storeToRefs(projectStore);
+const { getCurrentWage, getUnpaidSalary } = projectStore;
+const taskStore = useTaskStore();
+const { getTasks } = taskStore;
+
+const form = ref({
+  date: null
+});
+const rules = computed(() => ({
+  date: { required, $autodirty: true }
+}));
+const v$ = useVuelidate(rules, form);
+
+const submitForm = async () => {
+  if (v$.value.$invalid === false) {
+    let response = await axios.put(
+      `/api/tasks/complete`,
+      {
+        date: form.value.date,
+        project_id: project.value.id,
       }
-    },
-    ...mapActions(useProjectStore, ["getCurrentWage", "getUnpaidSalary"]),
-    ...mapActions(useTaskStore, ["getTasks"])
-  },
-  emits: ["form:close"]
+    )
+    if (!response) return
+
+    getCurrentWage();
+    getUnpaidSalary();
+    getTasks();
+    emits('form:close')
+  }
 }
 </script>
 
@@ -74,21 +57,21 @@ export default {
       <div class="flex-auto p-4 text-brand">
         <form @submit.prevent="submitForm">
           <div class="text-sm">
-            <Input type="date" v-model="form.date" :autofocus="true" :errors="v$.form.date.$errors">
+            <Input type="date" v-model="v$.date.$model" :autofocus="true" :errors="v$.date.$errors">
             <template #prefix>
               <font-awesome-icon icon="calendar" class="ml-2" />
             </template>
             </Input>
           </div>
           <div class="text-2xs text-brand/70 text-left">
-            {{ errors.size !== 0 ? Array.from(errors).join(', ') : '&nbsp;' }}
+            {{ v$.$errors.map(error => error.$message).join(', ') || '&nbsp;' }}
           </div>
           <div class="flex items-center gap-1 justify-end mt-1.5">
             <button type="submit" class="btn btn-text text-xs uppercase" :disabled="v$.$invalid">
               <font-awesome-icon icon="dollar" fixedWidth />
               Pay
             </button>
-            <button type="button" class="btn btn-text text-xs uppercase" @click="$emit('form:close')">
+            <button type="button" class="btn btn-text text-xs uppercase" @click="emits('form:close')">
               <font-awesome-icon icon="xmark" fixedWidth />
               Cancel
             </button>

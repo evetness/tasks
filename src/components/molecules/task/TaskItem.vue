@@ -1,30 +1,23 @@
-<script>
-import moment from 'moment/min/moment-with-locales'
+<script setup>
+import moment from 'moment/min/moment-with-locales';
+import { formatCurrency } from '@/utils';
 
-import { formatCurrency } from '@/utils'
 import { FontAwesomeIcon, FontAwesomeLayers } from "@fortawesome/vue-fontawesome";
 
-export default {
-  name: "TaskItem",
-  components: { FontAwesomeIcon, FontAwesomeLayers },
-  props: ["task", "disabled"],
-  computed: {
-    elapsed() { return moment.duration(this.task.elapsed).humanize() }
-  },
-  methods: {
-    formatCurrency,
-    moment,
-    time() {
-      const start = this.moment(this.task.start);
-      const end = this.moment(this.task.end);
-      if (start.format("YYYY-MM-DD") === end.format("YYYY-MM-DD")) {
-        return `${start.format("YYYY. MM. DD. HH:mm")} - ${end.format("HH:mm")}`;
-      }
-      return `${start.format("YYYY. MM. DD. HH:mm")} - ${end.format("DD. HH:mm")}`;
-    }
-  },
-  emits: ["task:edit", "task:remove"]
-}
+import { computed, defineProps, defineEmits } from 'vue';
+
+const props = defineProps(['task', 'disabled']);
+const emits = defineEmits(['task:edit', 'task:remove', 'task:complete']);
+
+const time = computed(() => {
+  const start = moment(props.task.start);
+  const end = moment(props.task.end);
+
+  if (start.format("YYYY-MM-DD") === end.format("YYYY-MM-DD")) {
+    return `${start.format("YYYY. MM. DD. HH:mm")} - ${end.format("HH:mm")}`;
+  }
+  return `${start.format("YYYY. MM. DD. HH:mm")} - ${end.format("DD. HH:mm")}`;
+})
 </script>
 
 <template>
@@ -33,8 +26,7 @@ export default {
       <div class="text-left">
         <div class="flex items-center gap-2 text-xs">
           <font-awesome-icon icon="calendar-day" />
-          {{ this.time() }}
-          <div class="font-italic text-2xs">(kb. {{ elapsed }})</div>
+          <div>{{ time }} <i>({{ task.elapsed }})</i></div>
         </div>
         <div class="font-medium tracking-wider text-brand/90">
           {{ task.name }}
@@ -47,11 +39,16 @@ export default {
         </div>
       </div>
     </button>
-    <font-awesome-layers class="absolute top-0 left-0 -translate-x-1/3 -translate-y-1/3">
-      <font-awesome-icon icon="circle" class="text-stone-900" />
-      <font-awesome-icon v-if="task.completed" icon="check-circle" class="text-brand/80" transform="shrink-5" />
-      <font-awesome-icon v-else icon="circle-half-stroke" class="text-brand/80" transform="shrink-5" />
-    </font-awesome-layers>
+
+    <button type="button" class="absolute top-0 left-0 -translate-x-1/3 -translate-y-1/3"
+      @click="emits('task:complete', props.id)">
+      <font-awesome-layers>
+        <font-awesome-icon icon="circle" class="text-stone-900" />
+        <font-awesome-icon v-if="task.completed" icon="check-circle" class="text-brand/80" transform="shrink-5" />
+        <font-awesome-icon v-else icon="circle-half-stroke" class="text-brand/80" transform="shrink-5" />
+      </font-awesome-layers>
+    </button>
+
   </div>
   <!-- <div class="group hover:bg-brand/20 pl-1">
     <div class="grid grid-cols-12 items-center gap-1 text-xs">

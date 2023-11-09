@@ -14,7 +14,6 @@ export const useProjectStore = defineStore("project", () => {
 
   // const selected = ref(useStorage("selectedProjectID", 0));
   const selected = ref(0);
-  const project = ref("");
   const projects = ref([]);
   const wage = ref(null);
   const salary = ref(null);
@@ -32,11 +31,13 @@ export const useProjectStore = defineStore("project", () => {
   const elapsed = computed(() => {
     return salary.value ? salary.value.elapsed : "00:00";
   });
+  const project = computed(() => {
+    return projects.value.find((obj) => obj.id === selected.value);
+  });
 
-  const selectProject = async (id, name) => {
+  const selectProject = async (id) => {
     if (id === selected.value) return null;
     selected.value = id;
-    project.value = name;
     getCurrentWage();
     getUnpaidSalary();
   };
@@ -70,7 +71,7 @@ export const useProjectStore = defineStore("project", () => {
   };
   const removeProject = (id) => {
     if (selected.value === id) {
-      selected.value = 0;
+      selectProject(0);
     }
     projects.value = projects.value.filter((obj) => obj.id !== id);
   };
@@ -99,8 +100,8 @@ export const useProjectStore = defineStore("project", () => {
 
   return {
     selected,
-    project,
     projects,
+    project,
     wage,
     salary,
     amount,

@@ -107,7 +107,19 @@ def update_tasks_status(data: TaskComplete) -> List[Task]:
     result = db.session.scalars(statement)
     logger.debug(result)
     for task in result:
-        task.update(completed=True).save()
+        task.update(completed=True)
+        db.session.add(task)
+    db.session.commit()
+
+    return result
+
+
+def change_task_status(ident: int) -> Task:
+    logger.debug(ident)
+
+    result = read_task(ident)
+    result.update(completed=not result.completed).save()
+    logger.debug(result)
 
     return result
 

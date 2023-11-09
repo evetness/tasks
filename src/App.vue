@@ -1,35 +1,31 @@
-<script>
-import { mapState, mapWritableState } from 'pinia'
+<script setup>
 import moment from "moment/min/moment-with-locales";
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+
+import ProjectList from "@/components/organisms/ProjectList.vue";
+import TaskList from '@/components/organisms/TaskList.vue';
+
+import { watch } from 'vue';
+
+import { storeToRefs } from 'pinia'
 import { useSettingsStore } from "@/stores/settings.js";
 import { useProjectStore } from '@/stores/project'
 import { useGlobalStore } from "@/stores/global.js";
 
-import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+const settingsStore = useSettingsStore();
+const { theme } = storeToRefs(settingsStore);
 
-import ProjectList from "@/components/organisms/ProjectList.vue";
-import WageCard from "@/components/organisms/WageCard.vue";
-import TaskList from '@/components/organisms/TaskList.vue';
+const projectStore = useProjectStore();
+const { selected } = storeToRefs(projectStore);
 
-export default {
-  name: "App",
-  components: { FontAwesomeIcon, ProjectList, WageCard, TaskList },
-  computed: {
-    ...mapWritableState(useSettingsStore, ["theme"]),
-    ...mapState(useProjectStore, ["selected"]),
-    ...mapWritableState(useGlobalStore, ["search", "inAction"]),
-  },
-  watch: {
-    selected() {
-      this.inAction = false
-    }
-  },
-  created() {
-    const language = navigator.language || (navigator.languages || ["en"])[0]
-    moment.locale(language)
-    document.documentElement.style.setProperty("--color-brand", this.theme)
-  }
-}
+const globalStore = useGlobalStore();
+const { inAction } = storeToRefs(globalStore);
+
+watch(selected, (newValue) => inAction.value = false);
+
+const language = navigator.language || (navigator.languages || ["en"])[0];
+moment.locale(language);
+document.documentElement.style.setProperty("--color-brand", theme.value);
 </script>
 
 <template>

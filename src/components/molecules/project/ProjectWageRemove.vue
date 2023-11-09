@@ -5,19 +5,26 @@ import { defineEmits, inject } from 'vue';
 
 import { storeToRefs } from "pinia";
 import { useProjectStore } from "@/stores/project.js";
+import { useTaskStore } from "@/stores/task.js";
 
 const emits = defineEmits(['form:close']);
 const axios = inject('axios');
 
 const projectStore = useProjectStore();
-const { project } = storeToRefs(projectStore);
+const { selected, amount } = storeToRefs(projectStore);
+const { getCurrentWage, getUnpaidSalary } = projectStore;
+
+const taskStore = useTaskStore();
+const { getTasks } = taskStore;
 
 const submitForm = async () => {
-  const response = await axios.delete(`/api/projects/${project.value.id}`)
+  const response = await axios.delete(`/api/projects/${selected.value}/wage`)
   if (response.status !== 204) return;
 
-  projectStore.removeProject(project.value.id);
-  emits('form:close')
+  getCurrentWage();
+  getUnpaidSalary();
+  getTasks();
+  emits('form:close');
 }
 </script>
 
@@ -35,7 +42,7 @@ const submitForm = async () => {
             <div class="flex leading-none">
               <font-awesome-icon icon="triangle-exclamation" size="lg" fixedWidth />
               <div class="ml-1 text-sm">
-                Remove <span class="font-bold">{{ project.name }}</span>?
+                Remove the current <span class="font-bold">{{ amount }}/h</span> wage?
               </div>
             </div>
           </div>

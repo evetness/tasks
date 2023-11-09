@@ -18,5 +18,6 @@ const pinia = createPinia();
 createApp(App)
   .use(pinia)
   .use(VueAxios, axios)
+  .provide("axios", axios)
   .component("font-awesome-icon", FontAwesomeIcon)
   .mount("#app");

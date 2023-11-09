@@ -1,63 +1,46 @@
-<script>
-import { mapActions, mapState } from 'pinia'
-import { useProjectStore } from '@/stores/project'
-import { useGlobalStore } from "@/stores/global";
-
+<script setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-
+import TaskAdd from '@/components/molecules/task/TaskAdd.vue';
 import TaskForm from '@/components/molecules/task/TaskForm.vue';
 import TaskItem from '@/components/molecules/task/TaskItem.vue';
 import TaskRemove from '@/components/molecules/task/TaskRemove.vue';
-import TaskSkeleton from "@/components/molecules/task/TaskSkeleton.vue";
+
+import { ref, computed, watch, onMounted } from 'vue';
+import { storeToRefs } from 'pinia';
+
+import { useProjectStore } from '@/stores/project';
+import { useGlobalStore } from "@/stores/global";
 import { useTaskStore } from "@/stores/task.js";
 
-export default {
-  name: "TaskList",
-  data() {
-    return {
-      create: false,
-      edit: 0,
-      remove: 0,
-      complete: false
-    };
-  },
-  computed: {
-    ...mapState(useTaskStore, ["tasks"]),
-    ...mapState(useProjectStore, ["selected"]),
-    ...mapState(useGlobalStore, ["inAction", "isTasksLoading"])
-  },
-  methods: {
-    async loadTasks() {
-      await this.getTasks();
-    },
-    ...mapActions(useTaskStore, ["getTasks"]),
-    ...mapActions(useGlobalStore, ["setAction"])
-  },
-  async mounted() {
-    await this.loadTasks()
-  },
-  watch: {
-    search() {
-      this.loadTasks()
-    },
-    selected() {
-      this.create = false;
-      this.edit = 0;
-      this.remove = 0;
-      this.loadTasks();
-    },
-    edit(newValue) {
-      this.setAction(newValue !== 0);
-    },
-    create(newValue) {
-      this.setAction(newValue)
-    },
-    remove(newValue) {
-      this.setAction(newValue !== 0)
-    }
-  },
-  components: { FontAwesomeIcon, TaskSkeleton, TaskForm, TaskItem, TaskRemove }
-}
+const projectStore = useProjectStore();
+const { selected, getUnpaidSalary } = storeToRefs(projectStore);
+
+const taskStore = useTaskStore();
+const { tasks } = storeToRefs(taskStore);
+const { getTasks, changeTaskStatus } = taskStore;
+
+const globalStore = useGlobalStore();
+const { inAction, isTasksLoading } = storeToRefs(globalStore);
+const { setAction } = globalStore;
+
+const create = ref(false);
+const edit = ref(0);
+const remove = ref(0);
+const open = ref(0);
+
+const skeletonSize = computed(() => Math.floor(Math.random() * 10) + 1);
+
+watch(selected, (newValue) => {
+  create.value = false;
+  edit.value = 0;
+  remove.value = 0;
+  getTasks();
+});
+watch(create, (newValue) => setAction(newValue));
+watch(edit, (newValue) => setAction(newValue !== 0));
+watch(remove, (newValue) => setAction(newValue !== 0));
+
+onMounted(async () => await getTasks());
 </script>
 
 <template>
@@ -68,10 +51,18 @@ export default {
     </div>
 
     <div class="space-y-1">
-      <TaskSkeleton v-if="isTasksLoading" />
+      <TaskForm v-if="create" @form:close="create = false" />
+      <TaskAdd v-else class="w-full" @form:add="create = true" />
+
+      <template v-if="isTasksLoading" v-for="n in skeletonSize">
+        <div class="group relative rounded-xl bg-brand/5 w-full h-16">
+          <div class="w-full p-3 flex items-center justify-between gap-2"></div>
+        </div>
+      </template>
+
       <template v-else v-for="task in tasks" :key="task.id">
         <TaskItem v-if="edit !== task.id && remove !== task.id" :task="task" @task:edit="edit = task.id"
-          @task:remove="remove = task.id" :disabled="inAction" />
+          @task:remove="remove = task.id" @task:complete="changeTaskStatus(task.id)" :disabled="inAction" />
 
         <TaskForm v-if="edit === task.id" :id="task.id" :name="task.name" :start="task.start" :end="task.end"
           :completed="task.completed" @form:close="edit = 0" />
@@ -79,13 +70,6 @@ export default {
         <TaskRemove v-if="remove === task.id" :id="task.id" :name="task.name" :start="task.start"
           @form:close="this.remove = 0" />
       </template>
-      <div class="w-full">
-        <TaskForm v-if="create" @form:close="create = false" />
-        <button v-else type="button" class="btn btn-text text-sm uppercase w-full justify-center"
-          :disabled="inAction || !selected" @click="create = true">
-          <font-awesome-icon icon="fa-solid fa-plus" />
-        </button>
-      </div>
     </div>
   </div>
 </template>

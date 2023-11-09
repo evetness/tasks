@@ -1,81 +1,60 @@
-<script>
+<script setup>
+import { ref, computed, inject, defineProps, defineEmits } from 'vue';
 import useVuelidate from '@vuelidate/core';
-import { required } from "@vuelidate/validators";
-import Input from '@/components/atoms/Input.vue';
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
-import { mapActions, mapState } from "pinia";
+import { required, maxLength } from "@vuelidate/validators";
+
+import { storeToRefs } from 'pinia';
 import { useProjectStore } from "@/stores/project.js";
 
-export default {
-  name: "ProjectForm",
-  props: ["isEdit"],
-  components: { FontAwesomeIcon, Input },
-  setup() {
-    return { v$: useVuelidate() }
-  },
-  computed: {
-    ...mapState(useProjectStore, ["selected", "project"])
-  },
-  data() {
-    return {
-      form: {
-        name: this.isEdit ? this.project : ""
-      },
-      vuelidateExternalResults: {
-        form: {
-          name: []
-        }
-      },
-      errors: new Set()
-    }
-  },
-  validations() {
-    return {
-      form: {
-        name: { required, $autoDirty: true }
-      }
-    }
-  },
-  methods: {
-    async submitForm() {
-      if (this.v$.$invalid === false) {
-        let response = null
-        if (this.isEdit) {
-          response = await this.axios.put(
-            `/api/projects/${this.selected}`,
-            { name: this.form.name }
-          ).catch((error) => {
-            if (error.response.status === 409) {
-              Object.assign(this.vuelidateExternalResults, { form: { name: [error.response.data.message] } })
-              this.errors.add(error.response.data.message)
-            }
-            return null;
-          })
-        } else {
-          response = await this.axios.post(
-            `/api/projects`,
-            { name: this.form.name }
-          ).catch((error) => {
-            if (error.response.status === 409) {
-              Object.assign(this.vuelidateExternalResults, { form: { name: [error.response.data.message] } })
-              this.errors.add(error.response.data.message)
-            }
-            return null;
-          })
-        }
-        if (!response) return
+import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
+import Input from "@/components/atoms/Input.vue";
 
-        const project = await response.data
-        this.updateProjects(project)
-        this.$emit('form:close')
-      }
-    },
-    ...mapActions(useProjectStore, ["updateProjects"]),
-  },
-  mounted() {
-    console.log(this.project)
-  },
-  emits: ["form:close"]
+const axios = inject('axios');
+const props = defineProps(['isEdit']);
+const emits = defineEmits(['form:close']);
+
+const projectStore = useProjectStore();
+const { project } = storeToRefs(projectStore);
+
+const form = ref({
+  name: props.isEdit ? project.value.name : "",
+});
+const rules = computed(() => ({
+  name: { required, maxLength: maxLength(20), $autodirty: true }
+}));
+const $externalResults = ref({});
+const v$ = useVuelidate(rules, form, { $externalResults });
+
+const submitForm = async () => {
+  if (v$.value.$invalid === false) {
+    let response = null;
+    if (props.isEdit) {
+      response = await axios.put(
+        `/api/projects/${project.value.id}`,
+        { name: form.value.name }
+      ).catch((error) => {
+        if (error.response.status === 409) {
+          $externalResults.value = { name: [error.response.data.message] };
+        }
+        return null;
+      })
+    } else {
+      response = await axios.post(
+        `/api/projects`,
+        { name: form.value.name }
+      ).catch((error) => {
+        if (error.response.status === 409) {
+          $externalResults.value = { name: [error.response.data.message] };
+        }
+        return null;
+      })
+    }
+    if (!response) return
+
+    const result = await response.data
+    projectStore.updateProjects(result)
+    emits('form:close')
+  }
 }
 </script>
 
@@ -91,21 +70,22 @@ export default {
       <div class="flex-auto p-4 text-brand">
         <form @submit.prevent="submitForm">
           <div class="text-sm">
-            <Input name="name" type="text" v-model="form.name" :autofocus="true" :errors="v$.form.name.$errors">
+            <Input name="name" type="text" maxlength="20" v-model="v$.name.$model" :autofocus="true"
+              :errors="v$.name.$errors">
             <template #prefix>
               <font-awesome-icon icon="clipboard" class="ml-2" />
             </template>
             </Input>
           </div>
           <div class="text-2xs text-brand/70 text-left">
-            {{ errors.size !== 0 ? Array.from(errors).join(', ') : '&nbsp;' }}
+            {{ v$.$errors.map(error => error.$message).join(', ') || '&nbsp;' }}
           </div>
           <div class="flex items-center gap-1 justify-end mt-2">
             <button type="submit" class="btn btn-text text-xs uppercase" :disabled="v$.$invalid">
               <font-awesome-icon icon="fa-regular fa-floppy-disk" fixedWidth />
               {{ isEdit ? 'Edit' : 'Add' }}
             </button>
-            <button type="button" class="btn btn-text text-xs uppercase" @click="$emit('form:close')">
+            <button type="button" class="btn btn-text text-xs uppercase" @click="emits('form:close')">
               <font-awesome-icon icon="xmark" fixedWidth />
               Cancel
             </button>
