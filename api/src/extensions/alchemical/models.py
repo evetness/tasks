@@ -4,6 +4,7 @@ from math import ceil
 from typing import Optional, TypeVar
 from loguru import logger
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
+from sqlalchemy.orm import lazyload
 from sqlmodel import Field, select, func
 
 from src.extensions import db
@@ -53,6 +54,18 @@ class Pagination:
         self._page = page
         self._per_page = per_page
         self._statement = statement
+        self.items = self.read_items()
+        self.total = self.read_total()
+
+    def read_items(self):
+        statement = self._statement.limit(self._limit).offset(self._offset)
+        logger.debug(statement)
+        return db.session.scalars(statement).unique().all()
+
+    def read_total(self):
+        statement = self._statement.options(lazyload('*')).order_by(None).subquery('total')
+        logger.debug(statement)
+        return db.session.scalar(select(func.COUNT()).select_from(statement))
 
     @property
     def _limit(self) -> int | None:
@@ -72,19 +85,7 @@ class Pagination:
 
     @property
     def per_page(self) -> int:
-        return self._per_page or self.total
-
-    @property
-    def items(self) -> list:
-        return db.session.scalars(
-            self._statement.limit(self._limit).offset(self._offset)
-        ).unique().all()
-
-    @property
-    def total(self) -> int:
-        return db.session.scalar(
-            select(func.count()).select_from(self._statement.subquery())
-        )
+        return self._per_page
 
     @property
     def pages(self) -> int:
@@ -114,5 +115,7 @@ class Pagination:
             return 0
         return self.page + 1
 
-    def __str__(self):
-        return f"Pagination(page={self.page}, per_page={self.per_page}, pages={self.pages}, total={self.total}, has_next={self.has_next}, next={self.next}, has_previous={self.has_previous}, previous={self.previous}, items={self.items})"
+    def __repr__(self):
+        return f"Pagination(page={self.page}, per_page={self.per_page}, pages={self.pages}, total={self.total}, " \
+               f"has_next={self.has_next}, next={self.next}, has_previous={self.has_previous}, previous={self.previous}, " \
+               f"items={self.items})"

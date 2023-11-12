@@ -10,7 +10,7 @@ const { inAction } = storeToRefs(globalStore);
 
 <template>
   <button type="button" class="group relative w-56 sm:w-72" @click="emits('form:add')" :disabled="inAction">
-    <div class="h-6 w-5/12 rounded-t-xl border-t-2 border-x-2 border-dashed" :class="{
+    <div class="h-7 w-24 sm:w-32 rounded-t-xl border-t-2 border-x-2 border-dashed" :class="{
       'border-brand/60 group-hover:bg-brand/20 group-focus:bg-brand/20': !inAction,
       'border-brand/40': inAction
     }">

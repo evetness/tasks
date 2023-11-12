@@ -31,7 +31,7 @@ const submitForm = async () => {
 <template>
   <div class="group relative w-64 sm:w-72">
     <div class="text-brand text-sm text-center">
-      <div class="h-6 w-5/12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/20">
+      <div class="h-7 w-24 sm:w-32 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/20">
         <font-awesome-icon icon="trash-can" />
       </div>
     </div>

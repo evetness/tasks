@@ -17,7 +17,7 @@ def parse_date(value: str, raise_error: bool = False):
 
 
 def timedelta_to_string(time: datetime.timedelta) -> str:
-    if time.seconds <= 0:
+    if time.total_seconds() <= 0:
         return "00:00"
     hours = (time.days * 24) + time.seconds // 3600
     minutes = (time.seconds // 60) % 60

@@ -49,7 +49,7 @@ const submitForm = async () => {
 <template>
   <div class="group relative w-64 sm:w-72">
     <div class="text-brand text-sm text-center">
-      <div class="h-6 w-5/12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/20">
+      <div class="h-7 w-24 sm:w-32 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/20">
         <font-awesome-icon icon="dollar" />
       </div>
     </div>
@@ -57,9 +57,10 @@ const submitForm = async () => {
       <div class="flex-auto p-4 text-brand">
         <form @submit.prevent="submitForm">
           <div class="text-sm">
-            <Input type="date" v-model="v$.date.$model" :autofocus="true" :errors="v$.date.$errors">
+            <Input type="date" v-model="v$.date.$model" :autofocus="true" :errors="v$.date.$errors"
+              class="flex-auto py-[5px]">
             <template #prefix>
-              <font-awesome-icon icon="calendar" class="ml-2" />
+              <font-awesome-icon icon="calendar" class="ml-2 py-2" />
             </template>
             </Input>
           </div>

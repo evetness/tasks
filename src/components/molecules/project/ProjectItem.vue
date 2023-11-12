@@ -25,35 +25,35 @@ const canPaySalary = computed(() => isSelected.value && !isSalaryLoading.value &
     <div class="flex gap-0.5 text-brand text-sm text-center">
 
       <button v-if="!isSelected" type="button" @click="selectProject(project.id)" :disabled="inAction"
-        class="h-6 w-5/12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/10" :class="{
+        class="h-7 w-24 sm:w-32 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/10" :class="{
           'group-hover:bg-brand/30 group-focus-within:bg-brand/30': !inAction
         }">
         <font-awesome-icon icon="clipboard" />
       </button>
 
       <button v-if="isSelected" type="button" @click="emits('project:edit', project.id)" :disabled="inAction"
-        class="h-6 w-2/12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/50" :class="{
+        class="h-7 w-11 sm:w-12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/50" :class="{
           'hover:bg-brand/60 focus:bg-brand/60': !inAction
         }">
         <font-awesome-icon icon="pen-to-square" />
       </button>
 
       <button v-if="isSelected" type="button" @click="emits('project:remove', project.id)" :disabled="inAction"
-        class="h-6 w-2/12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/50" :class="{
+        class="h-7 w-11 sm:w-12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/50" :class="{
           'hover:bg-brand/60 focus:bg-brand/60': !inAction
         }">
         <font-awesome-icon icon="trash-can" />
       </button>
 
       <button v-if="isSelected" type="button" @click="emits('project:salary', project.id)" :disabled="inAction"
-        class="h-6 w-2/12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/50" :class="{
+        class="h-7 w-11 sm:w-12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/50" :class="{
           'hover:bg-brand/60 focus:bg-brand/60': !inAction
         }">
         <font-awesome-icon icon="file-invoice-dollar" />
       </button>
 
       <button v-if="canPaySalary" type="button" @click="emits('project:pay', project.id)" :disabled="inAction"
-        class="h-6 w-2/12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/50" :class="{
+        class="h-7 w-11 sm:w-12 rounded-t-xl border-t-2 border-x-2 border-transparent bg-brand/50" :class="{
           'hover:bg-brand/60 focus:bg-brand/60': !inAction
         }">
         <font-awesome-icon icon="dollar" />

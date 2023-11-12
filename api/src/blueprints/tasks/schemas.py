@@ -1,6 +1,6 @@
 from dataclasses import dataclass, field
 import datetime
-from typing import List
+from typing import List, Literal
 from marshmallow import ValidationError, validates_schema, fields
 
 from marshmallow_dataclass import NewType, add_schema
@@ -13,7 +13,6 @@ Time = NewType("Time", str, field=fields.Time)
 @dataclass
 @add_schema
 class TaskBase(Base):
-    completed: bool
     name: str | None
     start: datetime.datetime
     end: datetime.datetime | None
@@ -29,6 +28,7 @@ class TaskBase(Base):
 @add_schema
 class TaskRead(TaskBase):
     id: int
+    completed: bool
     elapsed: str
     amount: float
     currency: str
@@ -64,6 +64,7 @@ class TaskOrderBy(OrderBy):
 class TaskQuery(Query):
     order_by: TaskOrderBy = field(default=TaskOrderBy.name)
     search: str | None = None
+    status: Literal['COMPLETED', 'INCOMPLETE'] | None = None
     project_id: int = field(default=0, metadata={"required": True})
 
 

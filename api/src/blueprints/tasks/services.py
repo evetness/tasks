@@ -1,4 +1,3 @@
-import datetime
 from typing import List
 
 from loguru import logger
@@ -22,7 +21,6 @@ def create_task(data: TaskCreate) -> Task:
         logger.warning(f"Task Already Exists: {_task.id} - {_task.start} - {_task.end}")
     
     result = Task(
-        completed=data.completed,
         name=data.name,
         start=data.start,
         end=data.end,
@@ -39,6 +37,12 @@ def read_tasks(query: TaskQuery) -> Pagination:
     where = []
     if query.project_id:
         where.append(Task.project_id == query.project_id)
+    if query.status:
+        status_query = {
+            'COMPLETED': Task.completed == True,
+            'INCOMPLETE': Task.completed == False
+        }
+        where.append(status_query[query.status])
     if query.search:
         search = [col(Task.name).contains(query.search)]
 
@@ -47,11 +51,17 @@ def read_tasks(query: TaskQuery) -> Pagination:
         end = parse_date(dates[1]) if len(dates) > 1 else None
 
         if start and not end:
-            search.append(Task.start >= start)
+            search.append((Task.start >= start))
         elif start and end:
             search.append((Task.start >= start) & (Task.end <= end))
+        
+        if query.search in ['paid', 'PAID']:
+            search.append(Task.completed == True)
 
         where.append(or_(*search))
+
+    if not query.search or query.search and query.search not in ['paid', 'PAID']:
+        where.append(Task.completed == False)
 
     statement = select(Task) \
         .where(*where) \
@@ -88,7 +98,6 @@ def update_task(ident: int, data: TaskUpdate):
     
     result = read_task(ident)
     result.update(
-        completed=data.completed,
         name=data.name,
         start=data.start,
         end=data.end
