@@ -1,5 +1,4 @@
 <script setup>
-import { defineEmits } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useGlobalStore } from '@/stores/global';
 

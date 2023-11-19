@@ -2,37 +2,66 @@
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import Input from '@/components/atoms/Input.vue';
 
+import { watch } from 'vue';
 import { storeToRefs } from 'pinia';
-import { ref, computed } from 'vue';
-import useVuelidate from '@vuelidate/core';
 
-import { useGlobalStore } from '@/stores/global';
+import { useProjectStore } from '@/stores/project';
+import { useTaskStore } from '@/stores/task';
 
+const projectStore = useProjectStore();
+const { selected } = storeToRefs(projectStore);
 
-const globalStore = useGlobalStore();
-const { search } = storeToRefs(globalStore);
+const taskStore = useTaskStore();
+const { search, status } = storeToRefs(taskStore);
+const { getTasks } = taskStore;
 
-const form = ref({
-  search: search.value || ""
+const states = [
+  "INCOMPLETE",
+  "COMPLETED",
+  null
+];
+let timer = null;
+
+const changeStatus = () => {
+  const index = states.indexOf(status.value);
+  if (index === (states.length - 1)) {
+    status.value = states[0];
+  } else {
+    status.value = states[index + 1];
+  }
+};
+
+watch(selected, () => {
+  search.value = "";
+  status.value = "INCOMPLETE";
 });
-const rules = computed(() => ({
-  search: { $autoDirty: true }
-}));
-const $externalResults = ref({});
-const v$ = useVuelidate(rules, form, { $externalResults });
+watch(search, () => {
+  if (timer) {
+    clearTimeout(timer);
+    timer = null;
+  }
+  timer = setTimeout(() => {
+    getTasks();
+  }, 400);
+})
+watch(status, () => getTasks());
 
 </script>
 
 <template>
-  <form class="text-brand text-sm">
+  <form class="text-brand text-sm" @submit.prevent="">
     <div class="flex items-center gap-1">
-      <Input name="search" type="text" v-model="search" :autofocus="false">
+      <Input name="search" type="text" v-model="search">
       <template #prefix>
         <font-awesome-icon icon="search" class="ml-2" />
       </template>
       </Input>
+
+      <button type="button" class="btn btn-brand py-[9px] rounded" @click="changeStatus">
+        <font-awesome-icon icon="circle-half-stroke" v-if="status === 'INCOMPLETE'" />
+        <font-awesome-icon icon="circle-check" v-if="status === 'COMPLETED'" />
+        <font-awesome-icon icon="infinity" v-if="status === null" />
+      </button>
     </div>
-    <small class="text-brand/80 2text-xs">Search for tasks in name, or type in <b>paid</b> or <b>inprogress</b> for query
-      task status.</small>
   </form>
 </template>

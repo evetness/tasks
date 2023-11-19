@@ -1,5 +1,6 @@
 import datetime
 from typing import List, Optional
+from sqlalchemy import Column
 
 from sqlmodel import Field, Relationship
 from src.constants import HOUR
@@ -72,3 +73,9 @@ class Task(Base, table=True):
         if not self.wage:
             return None
         return self.wage.currency
+
+
+class Setting(Base, table=True):
+    name: str = Field(max_length=255)
+    content: Optional[str] = Field(default=None, max_length=255)
+    language: Optional[str] = Field(default=None, max_length=255)

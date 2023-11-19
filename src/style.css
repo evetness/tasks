@@ -66,7 +66,7 @@ body {
     @apply inline-flex items-center gap-1 rounded-lg px-4 py-2.5 text-sm font-medium leading-none;
   }
   .btn-brand {
-    @apply bg-brand/40 text-brand hover:bg-brand/50 focus:bg-brand/50;
+    @apply bg-brand/20 text-brand hover:bg-brand/30 focus:bg-brand/30;
   }
   .btn-text {
     @apply text-brand hover:bg-brand/20 focus:bg-brand/20;

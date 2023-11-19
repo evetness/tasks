@@ -1,5 +1,5 @@
 <script setup>
-import { computed, defineEmits } from 'vue';
+import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useGlobalStore } from '@/stores/global';
 import { useProjectStore } from '@/stores/project';

@@ -1,7 +1,7 @@
 <script setup>
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 
-import { computed, defineProps, defineEmits } from 'vue';
+import { computed } from 'vue';
 
 import { storeToRefs } from 'pinia';
 import { useGlobalStore } from "@/stores/global.js";

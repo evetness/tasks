@@ -3,9 +3,9 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import Input from '@/components/atoms/Input.vue';
 
 import { storeToRefs } from 'pinia';
-import { ref, computed, inject, defineProps, defineEmits } from 'vue';
+import { ref, computed, inject } from 'vue';
 import useVuelidate from '@vuelidate/core';
-import { required } from "@vuelidate/validators";
+import { required, helpers } from "@vuelidate/validators";
 
 import { useProjectStore } from '@/stores/project'
 import { useTaskStore } from "@/stores/task.js";
@@ -20,16 +20,22 @@ const { selected } = storeToRefs(projectStore);
 const taskStore = useTaskStore();
 const { updateTasks } = taskStore;
 
+
 const form = ref({
   name: props.name || "",
   start: props.start || new Date(Date.now()).toISOString().slice(0, 16),
   end: props.end || null,
   project_id: selected.value
 });
+
+const minValue = (value) => {
+  return !helpers.req(value) || value >= form.value.start
+};
+
 const rules = computed(() => ({
   name: { $autoDirty: true },
   start: { required, $autoDirty: true },
-  end: { $autoDirty: true }
+  end: { minValue, $autoDirty: true }
 }));
 const $externalResults = ref({});
 const v$ = useVuelidate(rules, form, { $externalResults });
@@ -100,7 +106,7 @@ const submitForm = async () => {
 
       <div class="flex-auto self-stretch basis-52 sm:basis-auto md:self-center min-w-[13rem] sm:grow-0">
         <Input name="end" type="datetime-local" v-model="v$.end.$model" :errors="v$.end.$errors"
-          class="flex-auto py-[5px]">
+          class="flex-auto py-[5px]" :min="v$.start.$model">
         <template #prefix>
           <font-awesome-icon icon="calendar-week" class="ml-2 py-2" />
         </template>

@@ -2,7 +2,7 @@
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import moment from 'moment/min/moment-with-locales';
 
-import { defineProps, defineEmits, inject } from 'vue';
+import { inject } from 'vue';
 
 import { useTaskStore } from "@/stores/task.js";
 

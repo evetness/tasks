@@ -7,7 +7,6 @@ import { useGlobalStore } from "@/stores/global.js";
 
 export const useTaskStore = defineStore("task", () => {
   const globalStore = useGlobalStore();
-  const { search } = storeToRefs(globalStore);
   const { setTasksLoading } = globalStore;
 
   const projectStore = useProjectStore();
@@ -15,6 +14,8 @@ export const useTaskStore = defineStore("task", () => {
   const { getUnpaidSalary } = projectStore;
 
   const tasks = ref([]);
+  const search = ref("");
+  const status = ref("INCOMPLETE");
 
   const updateTasks = (task) => {
     const index = tasks.value.findIndex((obj) => obj.id === task.id);
@@ -65,6 +66,7 @@ export const useTaskStore = defineStore("task", () => {
         ...query,
         project_id: selected.value,
         search: search.value,
+        status: status.value,
       },
     });
     const data = await response.data;
@@ -73,5 +75,13 @@ export const useTaskStore = defineStore("task", () => {
     setTasksLoading(false);
   };
 
-  return { tasks, getTasks, changeTaskStatus, updateTasks, removeTask };
+  return {
+    tasks,
+    search,
+    status,
+    getTasks,
+    changeTaskStatus,
+    updateTasks,
+    removeTask,
+  };
 });

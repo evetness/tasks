@@ -55,13 +55,7 @@ def read_tasks(query: TaskQuery) -> Pagination:
         elif start and end:
             search.append((Task.start >= start) & (Task.end <= end))
         
-        if query.search in ['paid', 'PAID']:
-            search.append(Task.completed == True)
-
         where.append(or_(*search))
-
-    if not query.search or query.search and query.search not in ['paid', 'PAID']:
-        where.append(Task.completed == False)
 
     statement = select(Task) \
         .where(*where) \

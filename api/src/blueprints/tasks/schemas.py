@@ -20,7 +20,7 @@ class TaskBase(Base):
     @validates_schema
     def validate_task(self, data, **kwargs):
         # Validate the end date to be later than the start date
-        if data["end"] is not None and data["end"] <= data["start"]:
+        if data["end"] is not None and data["end"] < data["start"]:
             raise ValidationError("The end date must be later then the start date")
 
 

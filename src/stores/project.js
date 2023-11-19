@@ -1,10 +1,12 @@
 import axios from "axios";
-import { defineStore } from "pinia";
+import { defineStore, storeToRefs } from "pinia";
 import { useStorage } from "@vueuse/core";
 
 import { formatCurrency, sortByString } from "@/utils";
 import { computed, ref } from "vue";
 import { useGlobalStore } from "@/stores/global.js";
+import { useSettingsStore } from "@/stores/settings.js";
+import { PROJECT_STORAGE } from "@/constants";
 
 // useLocalStorage from vueuse for storing project id
 export const useProjectStore = defineStore("project", () => {
@@ -12,8 +14,12 @@ export const useProjectStore = defineStore("project", () => {
   const { setProjectLoading, setCurrentWageLoading, setSalaryLoading } =
     globalStore;
 
-  // const selected = ref(useStorage("selectedProjectID", 0));
-  const selected = ref(0);
+  const settingStore = useSettingsStore();
+  const { rememberProject } = storeToRefs(settingStore);
+
+  const selected = ref(
+    rememberProject.value ? useStorage(PROJECT_STORAGE, 0) : 0,
+  );
   const projects = ref([]);
   const wage = ref(null);
   const salary = ref(null);

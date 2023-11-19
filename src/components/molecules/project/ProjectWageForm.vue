@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, inject, defineEmits } from 'vue';
+import { ref, computed, inject } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, decimal } from "@vuelidate/validators";
 

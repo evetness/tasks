@@ -56,9 +56,11 @@ def register_logger(config: Config):
 def register_blueprints(app: APIFlask):
     from src.blueprints.projects.views import bp as projects
     from src.blueprints.tasks.views import bp as tasks
+    from src.blueprints.settings.views import bp as settings
 
     app.register_blueprint(projects)
     app.register_blueprint(tasks)
+    app.register_blueprint(settings)
 
 
 def register_commands(app: APIFlask):

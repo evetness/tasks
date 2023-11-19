@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, inject, defineProps, defineEmits } from 'vue';
+import { ref, computed, inject } from 'vue';
 import useVuelidate from '@vuelidate/core';
 import { required, maxLength } from "@vuelidate/validators";
 
@@ -70,8 +70,7 @@ const submitForm = async () => {
       <div class="flex-auto p-4 text-brand">
         <form @submit.prevent="submitForm">
           <div class="text-sm">
-            <Input name="name" type="text" maxlength="20" v-model="v$.name.$model" :autofocus="true"
-              :errors="v$.name.$errors">
+            <Input name="name" maxlength="20" v-model="v$.name.$model" :autofocus="true" :errors="v$.name.$errors">
             <template #prefix>
               <font-awesome-icon icon="clipboard" class="ml-2" />
             </template>

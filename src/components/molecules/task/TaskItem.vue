@@ -4,7 +4,7 @@ import { formatCurrency } from '@/utils';
 
 import { FontAwesomeIcon, FontAwesomeLayers } from "@fortawesome/vue-fontawesome";
 
-import { computed, defineProps, defineEmits } from 'vue';
+import { computed } from 'vue';
 import { storeToRefs } from 'pinia';
 import { useGlobalStore } from '@/stores/global';
 

@@ -20,13 +20,12 @@ const { tasks } = storeToRefs(taskStore);
 const { getTasks, changeTaskStatus } = taskStore;
 
 const globalStore = useGlobalStore();
-const { search, isTasksLoading } = storeToRefs(globalStore);
+const { isTasksLoading } = storeToRefs(globalStore);
 const { setAction } = globalStore;
 
 const create = ref(false);
 const edit = ref(0);
 const remove = ref(0);
-let timer = null;
 
 const skeletonSize = computed(() => Math.floor(Math.random() * 10) + 1);
 
@@ -39,15 +38,6 @@ watch(selected, () => {
 watch(create, (newValue) => setAction(newValue));
 watch(edit, (newValue) => setAction(newValue !== 0));
 watch(remove, (newValue) => setAction(newValue !== 0));
-watch(search, () => {
-  if (timer) {
-    clearTimeout(timer);
-    timer = null;
-  }
-  timer = setTimeout(() => {
-    getTasks();
-  }, 400);
-})
 
 onMounted(async () => await getTasks());
 </script>
@@ -81,6 +71,13 @@ onMounted(async () => await getTasks());
 
         <TaskRemove v-if="remove === task.id" :id="task.id" :name="task.name" :start="task.start"
           @form:close="remove = 0" />
+      </template>
+
+      <template v-if="!isTasksLoading && tasks.length == 0">
+        <div class="text-brand/80 text-center !my-4">
+          <div class="text-xl font-bold">No task found!</div>
+          <div class="text-sm">Modify the filters or add new task!</div>
+        </div>
       </template>
     </div>
   </div>
