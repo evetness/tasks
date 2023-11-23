@@ -10,9 +10,11 @@ import Settings from "./components/organisms/Settings.vue";
 import { storeToRefs } from 'pinia';
 import { useSettingsStore } from "@/stores/settings.js";
 import { useProjectStore } from "@/stores/project.js";
+import { useStorage } from '@vueuse/core';
+import { PROJECT_STORAGE } from './constants';
 
 const settingsStore = useSettingsStore();
-const { theme, rememberProject } = storeToRefs(settingsStore);
+const { theme } = storeToRefs(settingsStore);
 const { setIsOpen } = settingsStore;
 
 const projectStore = useProjectStore();
@@ -20,9 +22,13 @@ const { selected } = storeToRefs(projectStore);
 
 const language = navigator.language || (navigator.languages || ["en"])[0];
 moment.locale(language);
-document.documentElement.style.setProperty("--color-brand", theme.value);
 
-watch(rememberProject, () => console.log(rememberProject.value));
+const setRootProperty = () => {
+  document.documentElement.style.setProperty("--color-brand", theme.value);
+};
+setRootProperty();
+
+watch(theme, () => setRootProperty())
 </script>
 
 <template>

@@ -1,7 +1,9 @@
+import datetime
 from typing import List
+from apiflask import HTTPError
 
 from loguru import logger
-from sqlalchemy import extract, or_
+from sqlalchemy import or_
 from sqlmodel import col, select, text
 from src.blueprints.tasks.schemas import TaskCreate, TaskQuery, TaskUpdate, TaskComplete
 from src.extensions import db
@@ -13,12 +15,14 @@ from src.utils import parse_date
 def create_task(data: TaskCreate) -> Task:
     logger.debug(data)
 
+    # TODO check if start value is not in an already existing range
     statement = select(Task).where(Task.start <= data.start, Task.end >= data.start)
     logger.debug(statement)
 
     _task = db.session.scalar(statement)
     if _task:
         logger.warning(f"Task Already Exists: {_task.id} - {_task.start} - {_task.end}")
+        raise HTTPError(409)
     
     result = Task(
         name=data.name,
@@ -74,6 +78,7 @@ def read_task(ident: int) -> Task:
     result = db.session.get(Task, ident)
     if not result:
         logger.warning(f"Task Not Exists: {ident}")
+        raise HTTPError(404)
     logger.debug(result)
 
     return result
@@ -89,6 +94,7 @@ def update_task(ident: int, data: TaskUpdate):
     _task = db.session.scalar(statement)
     if _task:
         logger.warning(f"Task Already Exists: {_task.id} - {_task.start} - {_task.end}")
+        raise HTTPError(409)
     
     result = read_task(ident)
     result.update(
@@ -122,6 +128,19 @@ def change_task_status(ident: int) -> Task:
 
     result = read_task(ident)
     result.update(completed=not result.completed).save()
+    logger.debug(result)
+
+    return result
+
+
+def stop_task(ident: int) -> Task:
+    logger.debug(ident)
+
+    result = read_task(ident)
+    if result.end:
+        logger.warning(f"Task already done - {ident}")
+        raise HTTPError(409)
+    result.update(end=datetime.datetime.now()).save()
     logger.debug(result)
 
     return result

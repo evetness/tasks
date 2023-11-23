@@ -4,6 +4,7 @@ import { sortByDate } from "@/utils.js";
 import { ref } from "vue";
 import { useProjectStore } from "@/stores/project.js";
 import { useGlobalStore } from "@/stores/global.js";
+import { TASK_INCOMPLETE } from "@/constants";
 
 export const useTaskStore = defineStore("task", () => {
   const globalStore = useGlobalStore();
@@ -15,7 +16,7 @@ export const useTaskStore = defineStore("task", () => {
 
   const tasks = ref([]);
   const search = ref("");
-  const status = ref("INCOMPLETE");
+  const status = ref(TASK_INCOMPLETE);
 
   const updateTasks = (task) => {
     const index = tasks.value.findIndex((obj) => obj.id === task.id);
@@ -31,9 +32,22 @@ export const useTaskStore = defineStore("task", () => {
     tasks.value = tasks.value.filter((obj) => obj.id !== id);
     getUnpaidSalary();
   };
+  const stopTask = async (id) => {
+    const response = await axios.put(`/api/tasks/${id}/stop`).catch((error) => {
+      if (error.response.status === 404) {
+        const message = error.response.data.message;
+        console.error(message);
+      }
+      return null;
+    });
+    if (!response) return;
+
+    const data = response.data;
+    updateTasks(data);
+  };
   const changeTaskStatus = async (id) => {
     const response = await axios
-      .put(`/api/tasks/change-status/${id}`)
+      .put(`/api/tasks/${id}/change-status`)
       .catch((error) => {
         if (error.response.status === 404) {
           const message = error.response.data.message;
@@ -47,7 +61,8 @@ export const useTaskStore = defineStore("task", () => {
     updateTasks(data);
   };
   const getTasks = async (query) => {
-    if (!selected.value) {
+    if (selected.value === 0) {
+      setTasksLoading(false);
       tasks.value = [];
       return;
     }
@@ -80,6 +95,7 @@ export const useTaskStore = defineStore("task", () => {
     search,
     status,
     getTasks,
+    stopTask,
     changeTaskStatus,
     updateTasks,
     removeTask,

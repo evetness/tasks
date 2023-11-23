@@ -6,15 +6,39 @@ import {
   DialogPanel,
   DialogTitle,
 } from '@headlessui/vue'
+import Switch from '@/components/atoms/Switch.vue';
 
 import { storeToRefs } from 'pinia';
 import { useSettingsStore } from '@/stores/settings';
-import Switch from '@/components/atoms/Switch.vue';
+import { ref, computed, watch } from 'vue';
 
 const settingsStore = useSettingsStore();
-const { isOpen, rememberProject } = storeToRefs(settingsStore);
-const { setIsOpen, setRememberProject } = settingsStore;
+const { isOpen, theme, rememberProject } = storeToRefs(settingsStore);
+const { setIsOpen } = settingsStore;
 
+const hexToRgb = (hex) => {
+  var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result ? {
+    r: parseInt(result[1], 16),
+    g: parseInt(result[2], 16),
+    b: parseInt(result[3], 16)
+  } : null;
+};
+const rgbToHex = (r, g, b) => {
+  const rgb = (r << 16) | (g << 8) | (b << 0);
+  return '#' + (0x1000000 + rgb).toString(16).slice(1);
+};
+
+const themeToHex = computed(() => {
+  const rgb = theme.value.split(" ");
+  return rgbToHex(rgb[0], rgb[1], rgb[2])
+});
+const colorPicker = ref(themeToHex.value);
+
+watch(colorPicker, (newValue) => {
+  const rgb = hexToRgb(newValue);
+  theme.value = `${rgb.r} ${rgb.g} ${rgb.b}`;
+});
 </script>
 
 <template>
@@ -42,11 +66,24 @@ const { setIsOpen, setRememberProject } = settingsStore;
                 </button>
               </DialogTitle>
 
-              <div class="space-y-1 my-3">
-                <Switch label="Remember Project" v-model="rememberProject" />
+              <div class="space-y-3 my-5">
+                <Switch v-model="rememberProject">
+                  Remember Project
+                  <div class="text-xs text-brand/50">The application will remember the latest selectect project.</div>
+                </Switch>
+
+                <div class="flex items-center justify-between">
+                  <label for="theme-color-picker" class="mr-4 text-brand/80">
+                    Theme Color
+                    <div class="text-xs text-brand/50">The application will use the selected color.</div>
+                  </label>
+                  <div class="rounded overflow-hidden w-10 h-6">
+                    <input id="theme-color-picker" v-model="colorPicker" type="color" />
+                  </div>
+                </div>
               </div>
 
-              <div class="mt-4">
+              <div class="mt-6">
                 <button type="button" class="btn btn-brand" @click="setIsOpen(false)">
                   Close
                 </button>

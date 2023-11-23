@@ -7,6 +7,7 @@ import { storeToRefs } from 'pinia';
 
 import { useProjectStore } from '@/stores/project';
 import { useTaskStore } from '@/stores/task';
+import { TASK_INCOMPLETE, TASK_COMPLETED, TASK_STATES } from '@/constants';
 
 const projectStore = useProjectStore();
 const { selected } = storeToRefs(projectStore);
@@ -15,19 +16,14 @@ const taskStore = useTaskStore();
 const { search, status } = storeToRefs(taskStore);
 const { getTasks } = taskStore;
 
-const states = [
-  "INCOMPLETE",
-  "COMPLETED",
-  null
-];
 let timer = null;
 
 const changeStatus = () => {
-  const index = states.indexOf(status.value);
-  if (index === (states.length - 1)) {
-    status.value = states[0];
+  const index = TASK_STATES.indexOf(status.value);
+  if (index === (TASK_STATES.length - 1)) {
+    status.value = TASK_STATES[0];
   } else {
-    status.value = states[index + 1];
+    status.value = TASK_STATES[index + 1];
   }
 };
 
@@ -58,8 +54,8 @@ watch(status, () => getTasks());
       </Input>
 
       <button type="button" class="btn btn-brand py-[9px] rounded" @click="changeStatus">
-        <font-awesome-icon icon="circle-half-stroke" v-if="status === 'INCOMPLETE'" />
-        <font-awesome-icon icon="circle-check" v-if="status === 'COMPLETED'" />
+        <font-awesome-icon icon="circle-half-stroke" v-if="status === TASK_INCOMPLETE" />
+        <font-awesome-icon icon="circle-check" v-if="status === TASK_COMPLETED" />
         <font-awesome-icon icon="infinity" v-if="status === null" />
       </button>
     </div>

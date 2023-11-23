@@ -17,7 +17,7 @@ const { selected } = storeToRefs(projectStore);
 
 const taskStore = useTaskStore();
 const { tasks } = storeToRefs(taskStore);
-const { getTasks, changeTaskStatus } = taskStore;
+const { getTasks, changeTaskStatus, stopTask } = taskStore;
 
 const globalStore = useGlobalStore();
 const { isTasksLoading } = storeToRefs(globalStore);
@@ -64,7 +64,7 @@ onMounted(async () => await getTasks());
 
       <template v-else v-for="task in tasks" :key="task.id">
         <TaskItem v-if="edit !== task.id && remove !== task.id" :task="task" @task:edit="edit = task.id"
-          @task:remove="remove = task.id" @task:complete="changeTaskStatus(task.id)" />
+          @task:remove="remove = task.id" @task:complete="changeTaskStatus(task.id)" @task:stop="stopTask(task.id)" />
 
         <TaskForm v-if="edit === task.id" :id="task.id" :name="task.name" :start="task.start" :end="task.end"
           :completed="task.completed" @form:close="edit = 0" />

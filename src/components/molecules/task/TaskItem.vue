@@ -12,7 +12,7 @@ const globalStore = useGlobalStore();
 const { inAction } = storeToRefs(globalStore);
 
 const props = defineProps(['task']);
-const emits = defineEmits(['task:edit', 'task:remove', 'task:complete']);
+const emits = defineEmits(['task:edit', 'task:remove', 'task:complete', 'task:stop']);
 
 const time = computed(() => {
   const start = moment(props.task.start);
@@ -64,24 +64,36 @@ const time = computed(() => {
       </font-awesome-layers>
     </button>
 
-    <button v-if="!inAction" type="button" class="group/edit absolute -top-1.5 right-5 px-1" @click="emits('task:edit')">
-      <span class="sr-only">Edit</span>
-      <font-awesome-layers class="text-xl">
-        <font-awesome-icon icon="circle" class="text-stone-900" />
-        <font-awesome-icon icon="circle" class="text-brand/80 group-hover/edit:text-brand" transform="shrink-5" />
-        <font-awesome-icon icon="pen" class="text-stone-900" transform="shrink-10" />
-      </font-awesome-layers>
-    </button>
+    <div class="absolute -top-1.5 -right-2.5">
+      <div class="flex items-center gap-3">
+        <button v-if="!inAction && !task.end" type="button" class="group/stop" @click="emits('task:stop')">
+          <span class="sr-only">stop</span>
+          <font-awesome-layers class="text-xl">
+            <font-awesome-icon icon="circle" class="text-stone-900" />
+            <font-awesome-icon icon="circle" class="text-brand/80 group-hover/edit:text-brand" transform="shrink-5" />
+            <font-awesome-icon icon="hourglass-end" class="text-stone-900" transform="shrink-10" />
+          </font-awesome-layers>
+        </button>
 
-    <button v-if="!inAction" type="button" class="group/remove absolute -top-1.5 -right-2.5 px-1"
-      @click="emits('task:remove')">
-      <span class="sr-only">Delete</span>
-      <font-awesome-layers class="text-xl">
-        <font-awesome-icon icon="circle" class="text-stone-900" />
-        <font-awesome-icon icon="circle" class="text-brand/80 group-hover/remove:text-brand" transform="shrink-5" />
-        <font-awesome-icon icon="trash" class="text-stone-900" transform="shrink-10" />
-      </font-awesome-layers>
-    </button>
+        <button v-if="!inAction" type="button" class="group/edit" @click="emits('task:edit')">
+          <span class="sr-only">Edit</span>
+          <font-awesome-layers class="text-xl">
+            <font-awesome-icon icon="circle" class="text-stone-900" />
+            <font-awesome-icon icon="circle" class="text-brand/80 group-hover/edit:text-brand" transform="shrink-5" />
+            <font-awesome-icon icon="pen" class="text-stone-900" transform="shrink-10" />
+          </font-awesome-layers>
+        </button>
+
+        <button v-if="!inAction" type="button" class="group/remove" @click="emits('task:remove')">
+          <span class="sr-only">Delete</span>
+          <font-awesome-layers class="text-xl">
+            <font-awesome-icon icon="circle" class="text-stone-900" />
+            <font-awesome-icon icon="circle" class="text-brand/80 group-hover/remove:text-brand" transform="shrink-5" />
+            <font-awesome-icon icon="trash" class="text-stone-900" transform="shrink-10" />
+          </font-awesome-layers>
+        </button>
+      </div>
+    </div>
 
   </div>
 </template>

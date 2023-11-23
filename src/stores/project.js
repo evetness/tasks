@@ -6,7 +6,7 @@ import { formatCurrency, sortByString } from "@/utils";
 import { computed, ref } from "vue";
 import { useGlobalStore } from "@/stores/global.js";
 import { useSettingsStore } from "@/stores/settings.js";
-import { PROJECT_STORAGE } from "@/constants";
+import { PROJECT_STORAGE, SETTINGS_REMEMBER_PROJECT } from "@/constants";
 
 // useLocalStorage from vueuse for storing project id
 export const useProjectStore = defineStore("project", () => {
@@ -17,13 +17,27 @@ export const useProjectStore = defineStore("project", () => {
   const settingStore = useSettingsStore();
   const { rememberProject } = storeToRefs(settingStore);
 
-  const selected = ref(
-    rememberProject.value ? useStorage(PROJECT_STORAGE, 0) : 0,
-  );
+  const _selected = ref(0);
   const projects = ref([]);
   const wage = ref(null);
   const salary = ref(null);
 
+  const selected = computed({
+    get() {
+      if (rememberProject.value) {
+        const state = useStorage(PROJECT_STORAGE, 0);
+        return state.value;
+      }
+      return _selected.value;
+    },
+    set(value) {
+      if (rememberProject.value) {
+        const state = useStorage(PROJECT_STORAGE, 0);
+        state.value = value;
+      }
+      _selected.value = value;
+    },
+  });
   const amount = computed(() => {
     return wage.value
       ? formatCurrency(wage.value.amount, wage.value.currency)
