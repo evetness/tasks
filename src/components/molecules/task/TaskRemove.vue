@@ -5,6 +5,7 @@ import moment from 'moment/min/moment-with-locales';
 import { inject } from 'vue';
 
 import { useTaskStore } from "@/stores/task.js";
+import { useToastStore } from "@/stores/toast";
 
 const props = defineProps(['id', 'name', 'start']);
 const emits = defineEmits(['form:close']);
@@ -13,10 +14,18 @@ const axios = inject('axios');
 const taskStore = useTaskStore();
 const { removeTask } = taskStore;
 
+const toastStore = useToastStore();
+const { addToast } = toastStore;
+
 const submitForm = async () => {
-  const response = await axios.delete(`/api/tasks/${props.id}`);
-  if (response.status !== 204) return;
+  const response = await axios.delete(`/api/tasks/${props.id}`).catch((error) => {
+    addToast('exclamation-triangle', 'Task remove failed!', true, 5000);
+    return null;
+  });
+  if (!response) return;
+
   removeTask(props.id);
+  addToast('check-circle', 'Task successfully removed!', true, 2500);
   emits('form:close');
 }
 </script>

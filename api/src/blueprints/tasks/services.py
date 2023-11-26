@@ -14,15 +14,6 @@ from src.utils import parse_date
 
 def create_task(data: TaskCreate) -> Task:
     logger.debug(data)
-
-    # TODO check if start value is not in an already existing range
-    statement = select(Task).where(Task.start <= data.start, Task.end >= data.start)
-    logger.debug(statement)
-
-    _task = db.session.scalar(statement)
-    if _task:
-        logger.warning(f"Task Already Exists: {_task.id} - {_task.start} - {_task.end}")
-        raise HTTPError(409)
     
     result = Task(
         name=data.name,
@@ -87,14 +78,6 @@ def read_task(ident: int) -> Task:
 def update_task(ident: int, data: TaskUpdate):
     logger.debug(ident)
     logger.debug(data)
-
-    statement = select(Task).where(Task.id != ident, Task.start <= data.start, Task.end >= data.start)
-    logger.debug(statement)
-
-    _task = db.session.scalar(statement)
-    if _task:
-        logger.warning(f"Task Already Exists: {_task.id} - {_task.start} - {_task.end}")
-        raise HTTPError(409)
     
     result = read_task(ident)
     result.update(

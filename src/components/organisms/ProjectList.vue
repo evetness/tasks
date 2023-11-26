@@ -43,11 +43,11 @@ const hideItem = (projectId) => {
   }
 }
 
-watch(create, (newValue) => setAction(newValue));
-watch(edit, (newValue) => setAction(newValue !== 0));
-watch(remove, (newValue) => setAction(newValue !== 0));
-watch(pay, (newValue) => setAction(newValue !== 0));
-watch(wage, (newValue) => setAction(newValue !== 0));
+watch(create, (value) => setAction(value));
+watch(edit, (value) => setAction(value !== 0));
+watch(remove, (value) => setAction(value !== 0));
+watch(pay, (value) => setAction(value !== 0));
+watch(wage, (value) => setAction(value !== 0));
 
 onMounted(async () => {
   await getProjects();

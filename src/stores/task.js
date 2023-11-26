@@ -4,6 +4,7 @@ import { sortByDate } from "@/utils.js";
 import { ref } from "vue";
 import { useProjectStore } from "@/stores/project.js";
 import { useGlobalStore } from "@/stores/global.js";
+import { useToastStore } from "@/stores/toast.js";
 import { TASK_INCOMPLETE } from "@/constants";
 
 export const useTaskStore = defineStore("task", () => {
@@ -13,6 +14,9 @@ export const useTaskStore = defineStore("task", () => {
   const projectStore = useProjectStore();
   const { selected } = storeToRefs(projectStore);
   const { getUnpaidSalary } = projectStore;
+
+  const toastStore = useToastStore();
+  const { addToast } = toastStore;
 
   const tasks = ref([]);
   const search = ref("");
@@ -38,11 +42,13 @@ export const useTaskStore = defineStore("task", () => {
         const message = error.response.data.message;
         console.error(message);
       }
+      addToast("exclamation-triangle", "Ending Task failed!", true, 5000);
       return null;
     });
     if (!response) return;
 
     const data = response.data;
+    addToast("check-circle", "Task successfully ended!", true, 2500);
     updateTasks(data);
   };
   const changeTaskStatus = async (id) => {
@@ -53,11 +59,18 @@ export const useTaskStore = defineStore("task", () => {
           const message = error.response.data.message;
           console.error(message);
         }
+        addToast(
+          "exclamation-triangle",
+          "Task status change failed!",
+          true,
+          5000,
+        );
         return null;
       });
     if (!response) return;
 
     const data = response.data;
+    addToast("check-circle", "Task status successfully changed!", true, 2500);
     updateTasks(data);
   };
   const getTasks = async (query) => {

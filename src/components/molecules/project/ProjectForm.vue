@@ -8,6 +8,7 @@ import { useProjectStore } from "@/stores/project.js";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import Input from "@/components/atoms/Input.vue";
+import { useToastStore } from '@/stores/toast';
 
 const axios = inject('axios');
 const props = defineProps(['isEdit']);
@@ -15,6 +16,9 @@ const emits = defineEmits(['form:close']);
 
 const projectStore = useProjectStore();
 const { project } = storeToRefs(projectStore);
+
+const toastStore = useToastStore();
+const { addToast }= toastStore;
 
 const form = ref({
   name: props.isEdit ? project.value.name : "",
@@ -36,6 +40,7 @@ const submitForm = async () => {
         if (error.response.status === 409) {
           $externalResults.value = { name: [error.response.data.message] };
         }
+        addToast('exclamation-triangle', 'Project modification failed!', true, 5000);
         return null;
       })
     } else {
@@ -46,6 +51,7 @@ const submitForm = async () => {
         if (error.response.status === 409) {
           $externalResults.value = { name: [error.response.data.message] };
         }
+        addToast('exclamation-triangle', 'Project creation failed!', true, 5000);
         return null;
       })
     }
@@ -53,6 +59,7 @@ const submitForm = async () => {
 
     const result = await response.data
     projectStore.updateProjects(result)
+    addToast('check-circle', 'Project successfully saved!', true, 2500);
     emits('form:close')
   }
 }

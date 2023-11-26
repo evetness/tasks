@@ -9,6 +9,8 @@ import { required, helpers } from "@vuelidate/validators";
 
 import { useProjectStore } from '@/stores/project'
 import { useTaskStore } from "@/stores/task.js";
+import moment from 'moment';
+import { useToastStore } from '@/stores/toast';
 
 const axios = inject('axios');
 const props = defineProps(['id', 'name', 'start', 'end']);
@@ -20,10 +22,12 @@ const { selected } = storeToRefs(projectStore);
 const taskStore = useTaskStore();
 const { updateTasks } = taskStore;
 
+const toastStore = useToastStore();
+const { addToast } = toastStore;
 
 const form = ref({
   name: props.name || "",
-  start: props.start || new Date(Date.now()).toISOString().slice(0, 16),
+  start: props.start || moment().format().slice(0, 16),
   end: props.end || null,
   project_id: selected.value
 });
@@ -41,7 +45,6 @@ const $externalResults = ref({});
 const v$ = useVuelidate(rules, form, { $externalResults });
 
 const submitForm = async () => {
-  console.log(form.value);
   if (v$.value.$invalid === false) {
     let response = null
     if (props.id) {
@@ -53,10 +56,7 @@ const submitForm = async () => {
           end: form.value.end || null
         }
       ).catch((error) => {
-        if (error.response.status === 409) {
-          const message = error.response.data.message;
-          $externalResults.value = { start: [message], end: [message] };
-        }
+        addToast('exclamation-triangle', 'Task modification failed!', true, 5000);
         return null;
       })
     } else {
@@ -69,10 +69,7 @@ const submitForm = async () => {
           project_id: selected.value
         }
       ).catch((error) => {
-        if (error.response.status === 409) {
-          const message = error.response.data.message;
-          $externalResults.value = { start: [message], end: [message] };
-        }
+        addToast('exclamation-triangle', 'Task creation failed!', true, 5000);
         return null;
       })
     }
@@ -80,6 +77,7 @@ const submitForm = async () => {
 
     const data = await response.data;
     updateTasks(data);
+    addToast('check-circle', 'Task successfully saved!', false, 2500);
     emits('form:close');
   }
 }
@@ -89,7 +87,7 @@ const submitForm = async () => {
   <form @submit.prevent="submitForm" class="text-brand text-sm">
     <div class="rounded-xl bg-brand/5 p-3 flex flex-wrap lg:flex-nowrap items-center gap-1">
 
-      <Input name="name" type="text" v-model="v$.name.$model" :autofocus="true" :errors="v$.name.$errors">
+      <Input name="name" type="text" autofocus="true" v-model="v$.name.$model" :errors="v$.name.$errors">
       <template #prefix>
         <font-awesome-icon icon="clipboard" class="ml-2" />
       </template>

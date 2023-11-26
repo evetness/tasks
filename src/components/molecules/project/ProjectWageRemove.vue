@@ -6,6 +6,7 @@ import { inject } from 'vue';
 import { storeToRefs } from "pinia";
 import { useProjectStore } from "@/stores/project.js";
 import { useTaskStore } from "@/stores/task.js";
+import { useToastStore } from "@/stores/toast";
 
 const emits = defineEmits(['form:close']);
 const axios = inject('axios');
@@ -17,13 +18,20 @@ const { getCurrentWage, getUnpaidSalary } = projectStore;
 const taskStore = useTaskStore();
 const { getTasks } = taskStore;
 
+const toastStore = useToastStore();
+const { addToast }= toastStore;
+
 const submitForm = async () => {
-  const response = await axios.delete(`/api/projects/${selected.value}/wage`)
-  if (response.status !== 204) return;
+  const response = await axios.delete(`/api/projects/${selected.value}/wage`).catch((error) => {
+    addToast('exclamation-triangle', 'Wage remove failed!', true, 5000);
+    return null;
+  })
+  if (!response) return
 
   getCurrentWage();
   getUnpaidSalary();
   getTasks();
+  addToast('check-circle', 'Wage successfully removed!', true, 2500);
   emits('form:close');
 }
 </script>

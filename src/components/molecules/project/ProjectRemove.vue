@@ -5,6 +5,7 @@ import { inject } from 'vue';
 
 import { storeToRefs } from "pinia";
 import { useProjectStore } from "@/stores/project.js";
+import { useToastStore } from "@/stores/toast";
 
 const emits = defineEmits(['form:close']);
 const axios = inject('axios');
@@ -12,11 +13,18 @@ const axios = inject('axios');
 const projectStore = useProjectStore();
 const { project } = storeToRefs(projectStore);
 
+const toastStore = useToastStore();
+const { addToast }= toastStore;
+
 const submitForm = async () => {
-  const response = await axios.delete(`/api/projects/${project.value.id}`)
-  if (response.status !== 204) return;
+  const response = await axios.delete(`/api/projects/${project.value.id}`).catch((error) => {
+    addToast('exclamation-triangle', 'Project remove failed!', true, 5000);
+    return null;
+  })
+  if (!response) return
 
   projectStore.removeProject(project.value.id);
+  addToast('check-circle', 'Project successfully removed!', true, 2500);
   emits('form:close')
 }
 </script>

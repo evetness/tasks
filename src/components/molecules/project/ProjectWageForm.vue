@@ -5,6 +5,7 @@ import { required, decimal } from "@vuelidate/validators";
 
 import { useProjectStore } from "@/stores/project.js";
 import { useTaskStore } from "@/stores/task.js";
+import { useToastStore } from '@/stores/toast';
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import Input from "@/components/atoms/Input.vue";
@@ -16,8 +17,12 @@ const emits = defineEmits(['form:close', 'form:remove']);
 const projectStore = useProjectStore();
 const { project, wage } = storeToRefs(projectStore);
 const { getCurrentWage, getUnpaidSalary } = projectStore;
+
 const taskStore = useTaskStore();
 const { getTasks } = taskStore;
+
+const toastStore = useToastStore();
+const { addToast }= toastStore;
 
 const form = ref({
   date: wage.value ? wage.value.date : null,
@@ -41,12 +46,16 @@ const submitForm = async () => {
         amount: form.value.amount,
         currency: form.value.currency
       }
-    )
+    ).catch((error) => {
+      addToast('exclamation-triangle', 'Wage save failed!', true, 5000);
+      return null;
+    })
     if (!response) return;
 
     getCurrentWage();
     getUnpaidSalary();
     getTasks();
+    addToast('check-circle', 'Wage successfully saved!', true, 2500);
     emits('form:close');
   }
 }

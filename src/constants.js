@@ -1,7 +1,8 @@
-export const PROJECT_STORAGE = "selectedProjectID";
-export const SETTINGS_REMEMBER_PROJECT = "rememberProject";
-export const SETTINGS_THEME = "themeColor";
-export const TASK_STATUS_FILTER = "taskStatus";
+export const STORAGE_PROJECT_ID = ":SELECTED_PROJECT_ID";
+
+export const SETTINGS_REMEMBER_PROJECT = ":REMEMBER_PROJECT";
+export const SETTINGS_PROJECT_ID = STORAGE_PROJECT_ID;
+export const SETTINGS_THEME = ":THEME";
 
 export const TASK_INCOMPLETE = "INCOMPLETE";
 export const TASK_COMPLETED = "COMPLETED";

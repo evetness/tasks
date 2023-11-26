@@ -8,6 +8,7 @@ export const useGlobalStore = defineStore("global", () => {
   const isSalaryLoading = ref(false);
   const isTasksLoading = ref(false);
   const isWagesLoading = ref(false);
+  const isSettingsLoading = ref(false);
 
   const setAction = (state) => {
     inAction.value = state;
@@ -27,6 +28,9 @@ export const useGlobalStore = defineStore("global", () => {
   const setWagesLoading = (state) => {
     isWagesLoading.value = state;
   };
+  const setSettingsLoading = (state) => {
+    isSettingsLoading.value = state;
+  }
 
   return {
     inAction,
@@ -41,5 +45,7 @@ export const useGlobalStore = defineStore("global", () => {
     setTasksLoading,
     isWagesLoading,
     setWagesLoading,
+    isSettingsLoading,
+    setSettingsLoading
   };
 });

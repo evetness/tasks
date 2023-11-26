@@ -6,7 +6,7 @@ import { formatCurrency, sortByString } from "@/utils";
 import { computed, ref } from "vue";
 import { useGlobalStore } from "@/stores/global.js";
 import { useSettingsStore } from "@/stores/settings.js";
-import { PROJECT_STORAGE, SETTINGS_REMEMBER_PROJECT } from "@/constants";
+import { STORAGE_PROJECT_ID, SETTINGS_PROJECT_ID } from "@/constants";
 
 // useLocalStorage from vueuse for storing project id
 export const useProjectStore = defineStore("project", () => {
@@ -16,6 +16,7 @@ export const useProjectStore = defineStore("project", () => {
 
   const settingStore = useSettingsStore();
   const { rememberProject } = storeToRefs(settingStore);
+  const { saveSetting } = settingStore;
 
   const _selected = ref(0);
   const projects = ref([]);
@@ -25,15 +26,19 @@ export const useProjectStore = defineStore("project", () => {
   const selected = computed({
     get() {
       if (rememberProject.value) {
-        const state = useStorage(PROJECT_STORAGE, 0);
+        const state = useStorage(STORAGE_PROJECT_ID, _selected.value);
         return state.value;
       }
       return _selected.value;
     },
     set(value) {
+      const state = useStorage(STORAGE_PROJECT_ID, _selected.value);
       if (rememberProject.value) {
-        const state = useStorage(PROJECT_STORAGE, 0);
         state.value = value;
+        saveSetting(SETTINGS_PROJECT_ID, value.toString(), null);
+      } else {
+        saveSetting(SETTINGS_PROJECT_ID, null, null);
+        state.value = null;
       }
       _selected.value = value;
     },

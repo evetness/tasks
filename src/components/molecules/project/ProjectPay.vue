@@ -9,6 +9,7 @@ import { useTaskStore } from "@/stores/task.js";
 
 import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
 import Input from "@/components/atoms/Input.vue";
+import { useToastStore } from '@/stores/toast';
 
 const emits = defineEmits(['form:close']);
 const axios = inject('axios');
@@ -16,8 +17,13 @@ const axios = inject('axios');
 const projectStore = useProjectStore();
 const { project } = storeToRefs(projectStore);
 const { getCurrentWage, getUnpaidSalary } = projectStore;
+
 const taskStore = useTaskStore();
 const { getTasks } = taskStore;
+
+const toastStore = useToastStore();
+const { addToast }= toastStore;
+
 
 const form = ref({
   date: null
@@ -35,12 +41,16 @@ const submitForm = async () => {
         date: form.value.date,
         project_id: project.value.id,
       }
-    )
+    ).catch((error) => {
+      addToast('exclamation-triangle', 'Payment failed!', true, 5000);
+      return null;
+    })
     if (!response) return
 
     getCurrentWage();
     getUnpaidSalary();
     getTasks();
+    addToast('check-circle', 'Payment successful!', true, 2500);
     emits('form:close')
   }
 }

@@ -35,9 +35,9 @@ watch(selected, () => {
   remove.value = 0;
   getTasks();
 });
-watch(create, (newValue) => setAction(newValue));
-watch(edit, (newValue) => setAction(newValue !== 0));
-watch(remove, (newValue) => setAction(newValue !== 0));
+watch(create, (value) => setAction(value));
+watch(edit, (value) => setAction(value !== 0));
+watch(remove, (value) => setAction(value !== 0));
 
 onMounted(async () => await getTasks());
 </script>

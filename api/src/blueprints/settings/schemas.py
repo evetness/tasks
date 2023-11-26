@@ -9,7 +9,7 @@ from src.extensions.marshmallow_dataclass.schemas import Base
 @dataclass
 @add_schema
 class SettingBase(Base):
-    content: str = field(metadata={"type": "string <longtext>"})
+    content: str | None = field(metadata={"type": "string <longtext>"})
     language: str | None
 
   

@@ -10,11 +10,21 @@ import Switch from '@/components/atoms/Switch.vue';
 
 import { storeToRefs } from 'pinia';
 import { useSettingsStore } from '@/stores/settings';
-import { ref, computed, watch } from 'vue';
+import { computed, watch } from 'vue';
+import { useStorage } from '@vueuse/core';
+import { STORAGE_PROJECT_ID, SETTINGS_THEME, SETTINGS_REMEMBER_PROJECT, SETTINGS_PROJECT_ID } from '@/constants';
+import { useProjectStore } from '@/stores/project';
+import { useToastStore } from '@/stores/toast';
 
 const settingsStore = useSettingsStore();
 const { isOpen, theme, rememberProject } = storeToRefs(settingsStore);
-const { setIsOpen } = settingsStore;
+const { setIsOpen, saveSetting } = settingsStore;
+
+const projectStore = useProjectStore();
+const { selected } = storeToRefs(projectStore);
+
+const toastStore = useToastStore();
+const { addToast, removeToast } = toastStore;
 
 const hexToRgb = (hex) => {
   var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -29,16 +39,37 @@ const rgbToHex = (r, g, b) => {
   return '#' + (0x1000000 + rgb).toString(16).slice(1);
 };
 
-const themeToHex = computed(() => {
-  const rgb = theme.value.split(" ");
-  return rgbToHex(rgb[0], rgb[1], rgb[2])
+const colorPicker = computed({
+  get() {
+    const rgb = theme.value.split(" ");
+    return rgbToHex(rgb[0], rgb[1], rgb[2])
+  },
+  set(value) {
+    const rgb = hexToRgb(value);
+    theme.value = `${rgb.r} ${rgb.g} ${rgb.b}`;
+  }
 });
-const colorPicker = ref(themeToHex.value);
 
-watch(colorPicker, (newValue) => {
-  const rgb = hexToRgb(newValue);
-  theme.value = `${rgb.r} ${rgb.g} ${rgb.b}`;
-});
+watch(rememberProject, (value) => {
+  if (!value) {
+    const state = useStorage(STORAGE_PROJECT_ID, null);
+    state.value = null;
+  }
+})
+watch(isOpen, async (value) => {
+  if (!value) {
+    const toastIndex = addToast('info-circle', 'Saving settings!', false, 0);
+    await saveSetting(SETTINGS_THEME, theme.value.toString(), null);
+    await saveSetting(SETTINGS_REMEMBER_PROJECT, rememberProject.value.toString(), null);
+    if (rememberProject.value) {
+      await saveSetting(SETTINGS_PROJECT_ID, selected.value.toString(), null);
+    } else {
+      await saveSetting(SETTINGS_PROJECT_ID, null, null)
+    }
+    removeToast(toastIndex);
+    addToast('check-circle', 'Settings successfully saved!', false, 2500);
+  }
+})
 </script>
 
 <template>
